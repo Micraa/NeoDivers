@@ -1,0 +1,398 @@
+command /weapon [<integer>]:
+	permission: skript.admin
+	trigger:
+		open chest with 6 row named "&8WEAPON-LIST" to player
+		loop 54 times:
+			set slot (loop-number - 2) of player's current inventory to weapon({item.weapon::%loop-number + (54 * arg-1)%}, 1, 1)
+
+command /armor [<integer>]:
+	permission: skript.admin
+	trigger:
+		open chest with 6 row named "&8AORMOR-LIST" to player
+		loop 54 times:
+			set slot (loop-number - 2) of player's current inventory to armor({item.armor::%loop-number + (54 * arg-1)%}, 1, 1)
+
+command /item [<integer>]:
+	permission: skript.admin
+	trigger:
+		open chest with 6 row named "&8ITEM-LIST" to player
+		loop 54 times:
+			set slot (loop-number - 2) of player's current inventory to item({item.item::%loop-number + (54 * arg-1)%}, 1, 1)
+
+command /star [<integer>] [<integer>]:
+	permission: skript.admin
+	trigger:
+		set {_id} to "%tag ""id"" of nbt of player's tool%"
+		set {_type} to "%tag ""type"" of nbt of player's tool%"
+		if {_type} is "item":
+			remove player's tool from player's inventory
+			set player's tool to item({_id}, arg-1, arg-2)
+		if {_type} is "weapon":
+			remove player's tool from player's inventory
+			set player's tool to weapon({_id}, arg-1, arg-2)
+		if {_type} is "armor":
+			remove player's tool from player's inventory
+			set player's tool to armor({_id}, arg-1, arg-2)
+
+on load:
+	set {item.weapon::*} to "nuro.gun", "rapidrate.gun", "crea.gun", "rabbit.gun", "lambic.gun", "bond.gun", "light.gun", "holocide.sword" and "newcircle.sword"
+	set {item.armor::*} to "keep", "moon.helmet", "moon.chestplate", "moon.leggings" and "moon.boots"
+	set {item.item::*} to "star.material", "level.material", "eb.tool", "gold" and "crystal"
+
+function item(id: string, star: integer, lv: number) :: itemtype:
+	if {_star} is 0:
+		set {_star.text} to "&f⚝ &7(&f&l1&7)"
+	if {_star} is 1:
+		set {_star.text} to "&f⚝&8⚝⚝⚝⚝ &7(&f1&7)"
+	if {_star} is 2:
+		set {_star.text} to "&f⚝⚝&8⚝⚝⚝ &7(&f2&7)"
+	if {_star} is 3:
+		set {_star.text} to "&f⚝⚝⚝&8⚝⚝ &7(&f3&7)"
+	if {_star} is 4:
+		set {_star.text} to "&f⚝⚝⚝⚝&8⚝ &7(&f4&7)"
+	if {_star} is 5:
+		set {_star.text} to "&f⚝⚝⚝⚝⚝ &7(&f&l5&7)"
+
+	if {_id} is "eb.tool":
+		set {_give} to name tag named "&fエフェクトボードツール" with lore "&7アイテム-道具 &8| %{_star.text}%" and "" and "&7[0] 左クリック（攻撃）" and "&7- エフェクトボードの設定対象を攻撃した対象に変更" and "&7[0] 右クリック" and "&7- エフェクトボードの設定対象を自動切り替えに変更" and "&7[0] スニーク+右クリック" and "&7- エフェクトボード機能を停止" and "&7[0] エフェクトボード停止中+右クリック" and "&7- エフェクトボードを起動"
+		add "{id:%{_id}%,type:item,type2:tool,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+
+	if {_id} is "crystal":
+		set {_give} to diamond named "&b情報結晶" with lore "&7アイテム-財貨 &8| %{_star.text}%" and "" and "&7- 非常に価値の高い通貨"
+		add "{id:%{_id}%,type:item,type2:money,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "gold":
+		set {_give} to gold ingot named "&eゴールド &8[&7×&f&l%{_lv}%&8]" with lore "&7アイテム-財貨 &8| %{_star.text}%" and "" and "&7- 基本的な通貨"
+		add "{id:%{_id}%,type:item,type2:money,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+
+	if {_id} is "level.material":
+		set {_give} to iron ingot named "&bレベル素材" with lore "&7アイテム-素材 &8| %{_star.text}%" and "" and "&7- 合成したアイテムのレベルを上昇させる"
+		add "{id:%{_id}%,type:item,type2:material,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "star.material":
+		set {_give} to iron ingot of unbreaking 1 with hidden enchantments named "&f星⚝素材" with lore "&7アイテム-素材 &8| %{_star.text}%" and "" and "&7- 合成したアイテムの星⚝を上昇させる"
+		add "{id:%{_id}%,type:item,type2:material,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+
+	if {_id} is "bone.loot":
+		set {_give} to iron ingot of unbreaking 1 with hidden enchantments named "&f" with lore "&7アイテム-戦利品 &8| %{_star.text}%" and "" and "&7- アイテムの⚝を&f1&7増加させるのに使用できる"
+		add "{id:%{_id}%,type:item,type2:loot,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+
+	return {_give}
+
+function weapon(id: string, star: integer, lv: number) :: itemtype:
+	if {_star} is 0:
+		set {_star.text} to "&f⚝ &7(&f&l1&7)"
+	if {_star} is 1:
+		set {_star.text} to "&f⚝&8⚝⚝⚝⚝ &7(&f1&7)"
+	if {_star} is 2:
+		set {_star.text} to "&f⚝⚝&8⚝⚝⚝ &7(&f2&7)"
+	if {_star} is 3:
+		set {_star.text} to "&f⚝⚝⚝&8⚝⚝ &7(&f3&7)"
+	if {_star} is 4:
+		set {_star.text} to "&f⚝⚝⚝⚝&8⚝ &7(&f4&7)"
+	if {_star} is 5:
+		set {_star.text} to "&f⚝⚝⚝⚝⚝ &7(&f&l5&7)"
+
+	#sword
+
+	if {_id} is "newcircle.sword":
+		set {_attack} to floor(1000 + (0.1 * 100 * {_lv} * {_star}) + (100 * {_lv}))
+		set {_stable} to 6000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to iron sword named "&fニューサークル &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-剣 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[0] 左クリック（攻撃）" and "&7- 攻撃した対象に攻撃力&c100%%&7分のダメージ" and "&7[&62&7] 左クリック（クリティカル攻撃）" and "&7- 前方範囲内の対象に攻撃力&c50%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:sword,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63,AttributeModifiers:[{AttributeName:""generic.attackDamage"",Name:""generic.attackDamage"",Amount:1,Operation:0,UUIDLeast:35265,UUIDMost:630536}]}" to nbt of {_give}
+	if {_id} is "holocide.sword":
+		set {_attack} to floor(1000 + (0.1 * 100 * {_lv} * {_star}) + (100 * {_lv}))
+		set {_stable} to 9500
+		set {_crit_rate} to 5000
+		set {_crit_damage} to 15000 #1000*0.8(1+0.2*1)
+		set {_give} to iron sword named "&fホロサイド &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-剣 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&61&7] 左クリック（攻撃）" and "&7- 攻撃した対象に攻撃力&c100%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:sword,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63,AttributeModifiers:[{AttributeName:""generic.attackDamage"",Name:""generic.attackDamage"",Amount:1,Operation:0,UUIDLeast:35265,UUIDMost:630536}]}" to nbt of {_give}
+
+	#gun
+
+	if {_id} is "light.gun":
+		set {_attack} to floor(400 + (0.1 * 40 * {_lv} * {_star}) + (40 * {_lv}))
+		set {_stable} to 8000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to iron horse armour named "&fライト &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-銃 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&60.5&7] 右クリック" and "&7- 弾を発射 的中対象に攻撃力&c100%%&7分のダメージ" and "&7[&60.5~2.5&7] スニーク + 右クリック" and "&7- 弾を連続発射 的中対象に攻撃力&c100%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:gun,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "bond.gun":
+		set {_attack} to floor(600 + (0.1 * 60 * {_lv} * {_star}) + (60 * {_lv}))
+		set {_stable} to 8000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to golden horse armour named "&fボンド &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-銃 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&64&7] 右クリック" and "&7- 弾を発射 的中対象に攻撃力&c100%%&7分のダメージ" and "&7- 的中対象を中心としたの球形範囲内の対象に" and "&7  &c400%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:gun,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "lambic.gun":
+		set {_attack} to floor(800 + (0.1 * 80 * {_lv} * {_star}) + (80 * {_lv}))
+		set {_stable} to 4000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to golden horse armour named "&fランビック &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-銃 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&61&7] 右クリック" and "&7- 弾を発射 的中対象に攻撃力&c100%%&7分のダメージ" and "&7- 着弾点を中心としたの球形範囲内の対象に" and "&7  攻撃力&c300%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:gun,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "rabbit.gun":
+		set {_attack} to floor(700 + (0.1 * 70 * {_lv} * {_star}) + (70 * {_lv}))
+		set {_stable} to 6000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to golden horse armour named "&fラビット &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-銃 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&65&7] 右クリック" and "&7- 弾を発射 着弾点を中心としたの球形範囲内の対象に" and "&7  攻撃力&c500%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:gun,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "rapidrate.gun":
+		set {_attack} to floor(400 + (0.1 * 40 * {_lv} * {_star}) + (40 * {_lv}))
+		set {_stable} to 8000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to diamond horse armour named "&fラピッドレート &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-銃 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&60.5&7] 右クリック" and "&7- 弾を発射 着弾点を中心としたの球形範囲内の対象に" and "&7  攻撃力&c500%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:gun,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "nuro.gun":
+		set {_attack} to floor(200 + (0.1 * 20 * {_lv} * {_star}) + (20 * {_lv}))
+		set {_stable} to 9000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to diamond horse armour named "&fニューロ &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-銃 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&60.5~&7] 右クリック（長押し）" and "&7- クリックを解除するまで高速で弾を発射" and "&7- 的中対象に攻撃力&c100%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:gun,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "crea.gun":
+		set {_attack} to floor(500 + (0.1 * 50 * {_lv} * {_star}) + (50 * {_lv}))
+		set {_stable} to 9000
+		set {_crit_rate} to 2000
+		set {_crit_damage} to 20000
+		set {_give} to diamond horse armour named "&fクレア &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-銃 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&61~10&7] 右クリック（長押し）" and "&7- クリックを解除するまでコストをチャージ(MAX:10)" and "&7[&70&7] 右クリック（チャージ後）" and "&7- 弾を発射 的中対象に攻撃力&c100%%&7分のダメージ" and "&7- 着弾点から&fチャージコスト&7分&7の弾を拡散" and "&7- 的中対象に攻撃力&c100%%&7分のダメージ" and "&7- 着弾点を中心としたの球形範囲内の対象に" and "&7  攻撃力&c300%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:gun,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+
+	return {_give}
+
+function armor(id: string, star: integer, lv: number) :: itemtype:
+	if {_star} is 0:
+		set {_star.text} to "&f⚝ &7(&f&l1&7)"
+	if {_star} is 1:
+		set {_star.text} to "&f⚝&8⚝⚝⚝⚝ &7(&f1&7)"
+	if {_star} is 2:
+		set {_star.text} to "&f⚝⚝&8⚝⚝⚝ &7(&f2&7)"
+	if {_star} is 3:
+		set {_star.text} to "&f⚝⚝⚝&8⚝⚝ &7(&f3&7)"
+	if {_star} is 4:
+		set {_star.text} to "&f⚝⚝⚝⚝&8⚝ &7(&f4&7)"
+	if {_star} is 5:
+		set {_star.text} to "&f⚝⚝⚝⚝⚝ &7(&f&l5&7)"
+
+	if {_id} is "moon.helmet":
+		if {_star} >= 1:
+			set {_diffence} to floor(0.2 * 3.57 * {_lv} * {_star} + 3.57 * {_lv})
+			set {_give} to iron cap named "&f月の装備（ヘルメット） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ヘルメット &8| %{_star.text}%" and "" and "&9防御力 &9+%{_diffence}%"
+			add "{id:%{_id}%,type:armor,type2:helmet,star:%{_star}%,level:%{_lv}%,diffence:%{_diffence}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv})
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+	if {_id} is "moon.chestplate":
+		if {_star} >= 1:
+			set {_diffence} to floor(0.2 * 3.57 * {_lv} * {_star} + 3.57 * {_lv}) * 3
+			set {_give} to iron chestplate named "&f月の装備（チェストプレート） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-チェストプレート &8| %{_star.text}%" and "" and "&9防御力 &9+%{_diffence}%"
+			add "{id:%{_id}%,type:armor,type2:chestplate,star:%{_star}%,level:%{_lv}%,diffence:%{_diffence}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 3
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv}) * 3
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+	if {_id} is "moon.leggings":
+		if {_star} >= 1:
+			set {_diffence} to floor(0.2 * 3.57 * {_lv} * {_star} + 3.57 * {_lv}) * 2
+			set {_give} to iron leggings named "&f月の装備（レギンス） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-レギンス &8| %{_star.text}%" and "" and "&9防御力 &9+%{_diffence}%"
+			add "{id:%{_id}%,type:armor,type2:leggings,star:%{_star}%,level:%{_lv}%,diffence:%{_diffence}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 2
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv}) * 2
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+	if {_id} is "moon.boots":
+		if {_star} >= 1:
+			set {_diffence} to floor(0.2 * 3.57 * {_lv} * {_star} + 3.57 * {_lv})
+			set {_give} to iron boots named "&f月の装備（ブーツ） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ブーツ &8| %{_star.text}%" and "" and "&9防御力 &9+%{_diffence}%"
+			add "{id:%{_id}%,type:armor,type2:boots,star:%{_star}%,level:%{_lv}%,diffence:%{_diffence}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv})
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+
+	if {_id} is "comet.helmet":
+		if {_star} >= 1:
+			set {_hp_max} to floor(0.2 * 57.15 * {_lv} * {_star} + 57.14 * {_lv})
+			set {_give} to diamond cap named "&f彗星の装備（ヘルメット） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ヘルメット &8| %{_star.text}%" and "" and "&a最大HP &a+%{_hp_max}%"
+			add "{id:%{_id}%,type:armor,type2:helmet,star:%{_star}%,level:%{_lv}%,hp_max:%{_hp_max}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv})
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+	if {_id} is "comet.chestplate":
+		if {_star} >= 1:
+			set {_hp_max} to floor(0.2 * 57.15 * {_lv} * {_star} + 57.14 * {_lv}) * 3
+			set {_give} to diamond chestplate named "&f彗星の装備（チェストプレート） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-チェストプレート &8| %{_star.text}%" and "" and "&a最大HP &a+%{_hp_max}%"
+			add "{id:%{_id}%,type:armor,type2:chestplate,star:%{_star}%,level:%{_lv}%,hp_max:%{_hp_max}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv}) * 3
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 3
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+	if {_id} is "comet.leggings":
+		if {_star} >= 1:
+			set {_hp_max} to floor(0.2 * 57.15 * {_lv} * {_star} + 57.14 * {_lv}) * 2
+			set {_give} to diamond leggings named "&f彗星の装備（レギンス） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-レギンス &8| %{_star.text}%" and "" and "&a最大HP &a+%{_hp_max}%"
+			add "{id:%{_id}%,type:armor,type2:leggings,star:%{_star}%,level:%{_lv}%,hp_max:%{_hp_max}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv}) * 2
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 2
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+	if {_id} is "comet.boots":
+		if {_star} >= 1:
+			set {_hp_max} to floor(0.2 * 57.15 * {_lv} * {_star} + 57.14 * {_lv})
+			set {_give} to diamond boots named "&f彗星の装備（ブーツ） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ブーツ &8| %{_star.text}%" and "" and "&a最大HP &a+%{_hp_max}%"
+			add "{id:%{_id}%,type:armor,type2:boots,star:%{_star}%,level:%{_lv}%,hp_max:%{_hp_max}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_hp_max_rise} to floor(0.2 * 7.14 * {_lv} * {_star} + 7.14 * {_lv})
+			add "&a最大HP &a+%{_hp_max_rise} / 100%%%" to lore of {_give}
+			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_diffence_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&9防御力 &9+%{_diffence_rise} / 100%%%" to lore of {_give}
+			add "{diffence_rise:%{_diffence_rise}%}" to nbt of {_give}
+
+	if {_id} is "sun.helmet":
+		if {_star} >= 1:
+			set {_crit_rate_resist} to floor(0.2 * 2.86 * {_lv} * {_star} + 2.86 * {_lv})
+			set {_give} to gold cap named "&f太陽の装備（ヘルメット） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ヘルメット &8| %{_star.text}%" and "" and "&e会心抵抗力 &e+%{_crit_rate_resist}%"
+			add "{id:%{_id}%,type:armor,type2:helmet,star:%{_star}%,level:%{_lv}%,crit_rate_resist:%{_crit_rate_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv})
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+	if {_id} is "sun.chestplate":
+		if {_star} >= 1:
+			set {_crit_rate_resist} to floor(0.2 * 2.86 * {_lv} * {_star} + 2.86 * {_lv}) * 3
+			set {_give} to gold chestplate named "&f太陽の装備（チェストプレート） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-チェストプレート &8| %{_star.text}%" and "" and "&e会心抵抗力 &e+%{_crit_rate_resist}%"
+			add "{id:%{_id}%,type:armor,type2:chestplate,star:%{_star}%,level:%{_lv}%,crit_rate_resist:%{_crit_rate_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 3
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv}) * 3
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+	if {_id} is "sun.leggings":
+		if {_star} >= 1:
+			set {_crit_rate_resist} to floor(0.2 * 2.86 * {_lv} * {_star} + 2.86 * {_lv}) * 2
+			set {_give} to gold leggings named "&f太陽の装備（レギンス） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-レギンス &8| %{_star.text}%" and "" and "&e会心抵抗力 &e+%{_crit_rate_resist}%"
+			add "{id:%{_id}%,type:armor,type2:leggings,star:%{_star}%,level:%{_lv}%,crit_rate_resist:%{_crit_rate_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 2
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv}) * 2
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+	if {_id} is "sun.boots":
+		if {_star} >= 1:
+			set {_crit_rate_resist} to floor(0.2 * 2.86 * {_lv} * {_star} + 2.86 * {_lv})
+			set {_give} to gold boots named "&f太陽の装備（ブーツ） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ブーツ &8| %{_star.text}%" and "" and "&e会心抵抗力 &e+%{_crit_rate_resist}%"
+			add "{id:%{_id}%,type:armor,type2:boots,star:%{_star}%,level:%{_lv}%,crit_rate_resist:%{_crit_rate_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv})
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+
+	if {_id} is "jupiter.helmet":
+		if {_star} >= 1:
+			set {_crit_damage_resist} to floor(0.2 * 5.72 * {_lv} * {_star} + 5.71 * {_lv})
+			set {_give} to iron cap named "&f木星の装備（ヘルメット） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ヘルメット &8| %{_star.text}%" and "" and "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist}%"
+			add "{id:%{_id}%,type:armor,type2:helmet,star:%{_star}%,level:%{_lv}%,crit_damage_resist:%{_crit_damage_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv})
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+	if {_id} is "jupiter.chestplate":
+		if {_star} >= 1:
+			set {_crit_damage_resist} to floor(0.2 * 5.72 * {_lv} * {_star} + 5.71 * {_lv}) * 3
+			set {_give} to iron chestplate named "&f木星の装備（チェストプレート） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-チェストプレート &8| %{_star.text}%" and "" and "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist}%"
+			add "{id:%{_id}%,type:armor,type2:chestplate,star:%{_star}%,level:%{_lv}%,crit_damage_resist:%{_crit_damage_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv}) * 3
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 3
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+	if {_id} is "jupiter.leggings":
+		if {_star} >= 1:
+			set {_crit_damage_resist} to floor(0.2 * 5.72 * {_lv} * {_star} + 5.71 * {_lv}) * 2
+			set {_give} to iron leggings named "&f木星の装備（レギンス） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-レギンス &8| %{_star.text}%" and "" and "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist}%"
+			add "{id:%{_id}%,type:armor,type2:leggings,star:%{_star}%,level:%{_lv}%,crit_damage_resist:%{_crit_damage_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv}) * 2
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv}) * 2
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+	if {_id} is "jupiter.boots":
+		if {_star} >= 1:
+			set {_crit_damage_resist} to floor(0.2 * 5.72 * {_lv} * {_star} + 5.71 * {_lv})
+			set {_give} to iron boots named "&f木星の装備（ブーツ） &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7装備-ブーツ &8| %{_star.text}%" and "" and "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist}%"
+			add "{id:%{_id}%,type:armor,type2:boots,star:%{_star}%,level:%{_lv}%,crit_damage_resist:%{_crit_damage_resist}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_star} >= 3:
+			set {_crit_damage_resist_rise} to floor(0.2 * 5 * {_lv} * {_star} + 5 * {_lv})
+			add "&d会心ダメージ抵抗力 &d+%{_crit_damage_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_damage_resist_rise:%{_crit_damage_resist_rise}%}" to nbt of {_give}
+		if {_star} >= 5:
+			set {_crit_rate_resist_rise} to floor(0.2 * 4.29 * {_lv} * {_star} + 4.29 * {_lv})
+			add "&e会心抵抗力 &e+%{_crit_rate_resist_rise} / 100%%%" to lore of {_give}
+			add "{crit_rate_resist_rise:%{_crit_rate_resist_rise}%}" to nbt of {_give}
+
+	if {_id} is "keep":
+		set {_give} to totems of undying named "&fキープトーテム" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7- 使用者の体力が&f0&7以下になると発動" and "&7- 使用者に&e最大体力の%{_star}*8%%%&7分のシールド" and "&7- さらに &8<&a再生⬆&8: &a最大体力の%{_star}*0.5%%%&7分 (&f20&7)&8> &7を付与"
+		add "{id:%{_id}%,type:armor,type2:element,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+
+	return {_give}
+
+
+
