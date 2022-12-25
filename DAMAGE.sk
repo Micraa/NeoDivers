@@ -1,0 +1,434 @@
+on damage:
+	if target of victim is victim:
+		delete target of victim
+		cancel event
+		stop
+
+	if damage is 0 or 0.00001:
+		stop
+
+	victim is a living entity
+
+	set no damage ticks of victim to 0
+
+	if attacker is a player:
+		set {_damage} to damage
+		if {_damage} is 1.5:
+			set {_damage} to 1.2
+		victim is a player
+		cancel event
+		stop
+	else:
+		set {_damage} to 1
+	set damage to 0
+
+	if event-projectile is not set:
+		set {_item.id} to "%tag ""id"" of nbt of attacker's tool%"
+		set {_item.star} to "%tag ""star"" of nbt of attacker's tool%" parsed as number
+		set {_item.lv} to "%tag ""level"" of nbt of attacker's tool%" parsed as number
+		set {_attack_rate} to "%tag ""attack_rate"" of nbt of attacker's tool%" parsed as number
+		set {_attack_times} to "%tag ""attack_times"" of nbt of attacker's tool%" parsed as number
+		set {_heal_times} to "%tag ""heal_times"" of nbt of attacker's tool%" parsed as number
+		set {_item.attack} to "%tag ""attack"" of nbt of attacker's tool%" parsed as number
+		set {_item.stable} to "%tag ""stable"" of nbt of attacker's tool%" parsed as number
+		set {_item.crit_rate} to "%tag ""crit_rate"" of nbt of attacker's tool%" parsed as number
+		set {_item.crit_damage} to "%tag ""crit_damage"" of nbt of attacker's tool%" parsed as number
+		set {_item.diffence_resist} to "%tag ""diffence_resist"" of nbt of attacker's tool%" parsed as number
+		set {_item.heal} to "%tag ""heal"" of nbt of attacker's tool%" parsed as number
+		set {_item.attack_rise} to "%tag ""attack_rise"" of nbt of attacker's tool%" parsed as number
+		set {_item.stable_rise} to "%tag ""stable_rise"" of nbt of attacker's tool%" parsed as number
+		set {_item.crit_rate_rise} to "%tag ""crit_rate_rise"" of nbt of attacker's tool%" parsed as number
+		set {_item.crit_damage_rise} to "%tag ""crit_damage_rise"" of nbt of attacker's tool%" parsed as number
+		set {_item.diffence_resist_rise} to "%tag ""diffence_resist_rise"" of nbt of attacker's tool%" parsed as number
+		set {_item.heal_rise} to "%tag ""heal_rise"" of nbt of attacker's tool%" parsed as number
+	else:
+		if attacker is a player:
+			stop
+	set {_uuid.a} to uuid of attacker
+	set {_uuid.v} to uuid of victim
+	set {_team.a} to {team::%{_uuid.a}%}
+	set {_team.v} to {team::%{_uuid.v}%}
+	set {_attack} to ({attack::%{_uuid.a}%} + {_item.attack}) * (10000 + {attack_rise::%{_uuid.a}%} + {_item.attack_rise}) / 10000
+	set {_stable} to ({stable::%{_uuid.a}%} + {_item.stable}) * (10000 + {stable_rise::%{_uuid.a}%} + {_item.stable_rise}) / 10000
+	set {_crit_rate} to ({crit_rate::%{_uuid.a}%} + {_item.crit_rate}) * (10000 + {crit_rate_rise::%{_uuid.a}%} + {_item.crit_rate_rise}) / 10000
+	set {_crit_damage} to ({crit_damage::%{_uuid.a}%} + {_item.crit_damage}) * (10000 + {crit_damage_rise::%{_uuid.a}%} + {_item.crit_damage_rise}) / 10000
+	set {_diffence_resist} to ({diffence_resist::%{_uuid.a}%} + {_item.diffence_resist}) * (10000 + {diffence_resist_rise::%{_uuid.a}%} + {_item.diffence_resist_rise}) / 10000
+	set {_heal} to (({heal::%{_uuid.a}%} + {_item.heal}) * (10000 + {heal_rise::%{_uuid.a}%} + {_item.heal_rise}) / 10000)
+	set {_attack_resist} to {attack_resist::%{_uuid.v}%} * (10000 + {attack_resist_rise::%{_uuid.v}%}) / 10000
+	set {_stable_resist} to {stable_resist::%{_uuid.v}%} * (10000 + {stable_resist_rise::%{_uuid.v}%}) / 10000
+	set {_crit_rate_resist} to {crit_rate_resist::%{_uuid.v}%} * (10000 + {crit_rate_resist_rise::%{_uuid.v}%}) / 10000
+	set {_crit_damage_resist} to {crit_damage_resist::%{_uuid.v}%} * (10000 + {crit_damage_resist_rise::%{_uuid.v}%}) / 10000
+	set {_diffence} to {diffence::%{_uuid.v}%} * (10000 + {diffence_rise::%{_uuid.v}%}) / 10000
+	set {_heal_rate} to {heal_rate::%{_uuid.v}%} * (10000 + {heal_rate_rise::%{_uuid.v}%}) / 10000
+
+	if attacker is not a living entity: #consoleダメージ
+		attack(1, attacker, victim, {_damage}, 1000, 8000, 0, 0, 0, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
+		set damage to 0
+		stop
+
+	set {_random.n} to random integer between 0 and 99999 #パーティクルid用
+
+	if {_item.id} is "eb.tool":
+		{score.off::%uuid of attacker%} is not set
+		victim is alive
+		set {score.target::%uuid of attacker%} to victim
+		if victim is a player:
+			send "&7エフェクトボードの対象を &f%victim% &7に変更しました" to attacker
+		else:
+			send "&7エフェクトボードの対象を &c%{name::%uuid of victim%}% &7に変更しました" to attacker
+		stop
+
+	if {_item.id} is "newcircle.sword":
+		{_damage} is 1.2
+		set {_loc} to the block 5 meter infront of attacker's head
+		loop all entities in radius 4 around {_loc}:
+			loop-entity is not a player
+			loop-entity is not victim
+			distance between loop-entity and {_loc} <= 4
+			all blocks between loop-entity and {_loc} is air
+			{_team.a} is not {_team.v}
+			add loop-entity to {_list::*}
+		loop {_list::*}:
+			attack(1, attacker, loop-value, {_damage}, {_attack}*0.5, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
+			make attacker damage loop-value by 0
+
+	set {_last.attack} to {_attack} * {_attack_rate} / 10000
+	if {_attack_times} > 0:
+		{_team.a} is not {_team.v}
+		loop {_attack_times} times:
+			victim is alive
+			broadcast "%attacker%, %victim%, %{_damage}%, %{_attack}%, %{_attack_resist}%, %{_stable}%, %{_stable_resist}%, %{_crit_rate}%"
+			attack(1, attacker, victim, {_damage}, {_last.attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
+
+	if {_heal_times} > 0:
+		{_team.a} is {_team.v}
+		loop {_heal_times} times:
+			victim is alive
+			heal(1, attacker, victim, {_heal}, {_heal_rate})
+
+	stopEffect id "%{_random.n}%"
+
+function attack(mode: integer, attacker: entity, victim: entity, damage: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number, attack_resist: number, stable_resist: number, crit_rate_resist: number, crit_damage_resist: number, diffence: number,):
+	set {_uuid.a} to uuid of {_attacker}
+	set {_uuid.v} to uuid of {_victim}
+	{hp_now::%{_uuid.v}%} is set
+	{_victim} is a living entity
+
+	if {level::%{_uuid.v}%} - {level::%{_uuid.a}%} > 0:
+		set {_damage} to {_damage} * (1 - (0.02 * ({level::%{_uuid.v}%} - {level::%{_uuid.a}%})))
+
+	if {_mode} is 0:
+		set {_color} to "&c"
+		set {_attacker.name} to "CONSOLE"
+	else:
+		if {_attacker} is a player:
+			set {_attacker.name} to "%{_attacker}%"
+			set {_color} to "&b&l"
+		else:
+			set {_attacker.name} to "%{name::%{_uuid.a}%}%"
+			set {_damage} to 1
+			set {_color} to "&c&l"
+	if {_victim} is player:
+		set {_victim.name} to "%{_victim}%"
+	else:
+		if {name::%{_uuid.v}%} is set:
+			set {_victim.name} to "%{name::%{_uuid.v}%}%"
+		else:
+			set {_victim.name} to "%{_victim}%"
+
+	loop {atk.effect.%{_uuid.a}%::*}:
+		set {_value::*} to loop-value split at "|"
+		if {_value::2} is "number":
+			add {_value::4} parsed as number to {_%{_value::3}%}
+	loop {vic.effect.%{_uuid.v}%::*}:
+		set {_value::*} to loop-value split at "|"
+		if {_value::2} is "number":
+			add {_value::4} parsed as number to {_%{_value::3}%}
+	loop {atk.effect.%{_uuid.a}%::*}:
+		set {_value::*} to loop-value split at "|"
+		if {_value::2} is "rate":
+			set {_%{_value::3}%} to {_%{_value::3}%} * {_value::4} parsed as number
+	loop {vic.effect.%{_uuid.v}%::*}:
+		set {_value::*} to loop-value split at "|"
+		if {_value::2} is "rate":
+			set {_%{_value::3}%} to {_%{_value::3}%} * {_value::4} parsed as number
+
+	set {_attack} to {_attack} * (10000 + {_attack_rise}) / 10000
+	set {_attack_resist} to {_attack_resist} * (10000 + {_attack_resist_rise}) / 10000
+	set {_stable} to {_stable} * (10000 + {_stable_rise}) / 10000
+	set {_stable_resist} to {_stable_resist} * (10000 + {_stable_resist_rise}) / 10000
+	set {_crit_rate} to {_crit_rate} * (10000 + {_crit_rate_rise}) / 10000
+	set {_crit_rate_resist} to {_crit_rate_resist} * (10000 + {_crit_rate_resist_rise}) / 10000
+	set {_crit_damage} to {_crit_damage} * (10000 + {_crit_damage_rise}) / 10000
+	set {_crit_damage_resist} to {_crit_damage_resist} * (10000 + {_crit_damage_resist_rise}) / 10000
+	set {_diffence} to {_diffence} * (10000 + {_diffence_rise}) / 10000
+	set {_diffence_resist} to {_diffence_resist} * (10000 + {_diffence_resist_rise}) / 10000
+#	broadcast "atk:%{_attack}%, Ratk:%{_attack_resist}%, stb:%{_stable}%, Rstb:%{_stable_resist}%, rate:%{_crit_rate}%, Rrate%{_crit_rate_resist}%, cdam:%{_crit_damage}%, Rcdam:%{_crit_damage_resist}%, def:%{_diffence}%, Rdef%{_diffence_resist}%"
+
+	set {_last.stable} to calc_delout({_stable} * (10000 - {_stable_resist}) / 100000000, 0, 1)
+	set {_last.attack_resist} to calc_delout((10000 - {_attack_resist}) / 10000, 0.2, 1)
+	set {_last.attack} to random number between {_attack} * {_last.attack_resist} and {_attack} * {_last.attack_resist} * {_last.stable}
+
+	set {_last.crit_rate} to calc_delout({_crit_rate} * (10000 - {_crit_rate_resist}) / 1000000, 0, 100)
+	set {_last.crit_damage} to 1
+	chance of {_last.crit_rate}%:
+		set {_last.crit_damage_resist} to calc_delout((10000 - {_uncrit_damage}) / 10000, 0.2, 1)
+		set {_last.crit_damage} to calc_delout({_crit_damage} * {_last.crit_damage_resist} / 10000, 1, {_none})
+
+	set {_last.diffence_resist} to calc_delout((10000 - {_diffence_resist}) / 10000, 0, 1)
+	set {_last.diffence} to calc_delout((10000 - ({_diffence} * {_diffence_resist})) / 10000, 0.2, 1)
+
+	set {_last.damage} to floor({_damage} * {_last.attack} * {_last.crit_damage} * {_last.diffence})
+	set {_drate.b} to ({hp_now::%{_uuid.v}%} + {shield_now::%{_uuid.v}%}) / {hp_max::%{_uuid.v}%} * 100
+	damage({_mode}, {_attacker}, {_victim}, {_last.damage})
+	set {_drate.a} to (({hp_now::%{_uuid.v}%} + {shield_now::%{_uuid.v}%}) / {hp_max::%{_uuid.v}%} * 100) - {_drate.b}
+
+	broadcast "&8[&c%{_attacker.name}% &7-> &b%{_victim.name}%&8] &8(%{_color}%%{_last.damage}%&8) &8(&c♥%{_drate.a}%&7%%&8) &7%now formatted as ""HH:mm:ss""%"
+#	broadcast "&7Dam: &f%{_damage}%, &7atk: &f%{_last.attack}%, &7Ratk: &f%{_last.attack_resist}%, &7stb: &f%{_last.stable}%, &7crate: &f%{_last.crit_rate}%, &7cdam: &f%{_last.crit_damage}%, &7Rcdam: &f%{_last.crit_damage_resist}%, &7def: &f%{_last.diffence}%, &7Rdef: &f%{_last.diffence_resist}%"
+
+function calc_delout(calc: number, lower: number, apper: number) :: number:
+	if {_calc} < {_lower}:
+		set {_calc} to {_lower}
+	if {_calc} > {_apper}:
+		set {_calc} to {_apper}
+	return {_calc}
+
+function damage(mode: integer, attacker: entity, victim: entity, damage: number):
+	set {_uuid.v} to uuid of {_victim}
+	set {_uuid.a} to uuid of {_attacker}
+	set {_before} to {shield_now::%{_uuid.v}%}+{hp_now::%{_uuid.v}%}
+	set {_damage} to floor({_damage})
+
+	if {shield_now::%{_uuid.v}%} > 0:
+		if {_damage} <= {shield_now::%{_uuid.v}%}:
+			remove {_damage} from {shield_now::%{_uuid.v}%}
+		else:
+			remove {shield_now::%{_uuid.v}%} from {_damage}
+			set {shield_now::%{_uuid.v}%} to 0
+			remove {_damage} from {hp_now::%{_uuid.v}%}
+	else:
+		remove {_damage} from {hp_now::%{_uuid.v}%}
+
+	if {_victim} is a player:
+		if {hp_now::%{_uuid.v}%} <= 0:
+			if tag "id" of nbt of {element.%{armor_set::%{_uuid.v}%}%::%{_uuid.v}%} is "keep":
+				set {_star} to "%tag ""star"" of nbt of {element.%{armor_set::%{_uuid.v}%}%::%{_uuid}%}%" parsed as number
+				set {_value} to floor({hp_max::%{_uuid.v}%}*0.5*{_star})
+				set {hp_max::%{_uuid.v}%} to 2
+				shield(1, {_victim}, {_victim}, {hp_max::%{_uuid.v}%}*0.1, {heal_rate::%{_uuid.v}%})
+				effect(1, {_victim}, "etc", {_victim}, "keep", "regeneration", "addition", {_value}, 20, "&a再生⬆&8: &a%{_value}%", "good", 50, 200, 50)
+				soundloc(all players, location of {_victim}, "item.totem.use", 1, 1)
+				particle("TOTEM", 100, 0.7, 0.3, 0.3, 0.3, location of {_victim})
+				holo({_victim}, "&c♥ &c-&c&l%difference between {_before} and 0%", 1 seconds)
+				exit 2 sections
+			death({_mode}, {_attacker}, {_victim})
+			stop
+		else:
+			holo({_victim}, "&c♥ &c-&c&l%difference between {_before} and {hp_now::%{_uuid.v}%}+{shield_now::%{_uuid.v}%}%", 1 seconds)
+		set {_victim}'s health to {hp_now::%{_uuid.v}%} / {hp_max::%{_uuid.v}%} * 10
+		set {_victim}'s absorption hearts to {shield_now::%{_uuid.v}%} / {hp_max::%{_uuid.v}%} * 20
+		actionbar_hp({_victim})
+	else:
+		named_hp({_victim})
+		if {hp_now::%{_uuid.v}%} <= 0:
+			death({_mode}, {_attacker}, {_victim})
+			holo({_victim}, "&c♥ &c-&c&l%difference between {_before} and 0%", 1 seconds)
+			stop
+#	send red tint to {_victim} with fadeTime 0, intensity 1 and damageMode true
+
+function death(mode: integer, attacker: entity, victim: entity):
+	set {_uuid.v} to uuid of {_victim}
+	set {_uuid.a} to uuid of {_attacker}
+
+	if {_victim} is a player:
+		delete_data_effect({_victim})
+		sound({_victim}, "entity.zombie_villager.cure", 1, 1.5)
+		apply blindness 1 without particles to {_victim} for 8 seconds
+		set gamemode of {_victim} to spectator
+#		teleport {_victim} to location(random integer between 1 and 200, 255, random integer between 1 and 200)
+		set {hp_now::%{_uuid.v}%} to {hp_max::%{_uuid.v}%}
+		set {shield_now::%{_uuid.v}%} to 0
+		set {_victim}'s health to {hp_now::%{_uuid.v}%} / {hp_max::%{_uuid.v}%} * 10
+		wait 1 seconds
+		send title "&cダメージが許容量を超過しました" with subtitle "&7EMERGECY ESCAPE" to {_victim} for 3 seconds with fadein 20 ticks and fade out 20 ticks
+		wait 5 seconds
+		sound({_victim}, "entity.sheep.shear", 2, 1.4)
+		set gamemode of {_victim} to adventure
+		if {_victim} is op:
+			set gamemode of {_victim} to creative
+			make {_victim} fly
+		wait 1 seconds
+		sound({_victim}, "ui.toast.in", 10, 1.2)
+		stop
+
+	if {id::%{_uuid.v}%} is "zombie":
+		loop 3 times:
+			chance of ((loop-number * 10) + {level::%{_uuid.v}%})%:
+				add 1 to {_loot.1}
+		set {_i} to item("diamond", 0, 0)
+		set {_drop.1} to {_loot.1} of {_i}
+		if {option.magnet::%{_uuid.a}%} is 1:
+			give {_drop.1} to {_attacker}
+		else:
+			set {_t} to "%name of {_drop.1}% &7for &7%{_attacker}%"
+			add "{canpick:%{_attacker}%,CustomNameVisible:1}" to nbt of {_drop.1}
+			drop {_drop.1} at {_victim}
+			make last spawned entity glow for {_attacker}
+
+	set health of {_victim} to 0
+	teleport {_victim} to location(0, 0, 0)
+	delete_data_entity({_victim})
+
+#On item spawn:
+#	if "%tag ""holoname"" of nbt of event-item%" is set:
+#		Add "{CustomName:""%tag ""holoname"" of nbt of event-item%"",CustomNameVisible:1}" To nbt of event-entity
+on pick up:
+	if tag "canpick" of nbt of event-item is set:
+		if "%tag ""canpick"" of nbt of event-item%" is not "%player%":
+			cancel event
+
+On item spawn:
+	if tag "canpick" of nbt of event-item is not set:
+		if name of event-item is set:
+			Add "{CustomName:""%name of event-item%"",CustomNameVisible:1}" To nbt of event-entity
+		else:
+			Add "{CustomName:""%event-item%"",CustomNameVisible:1}" To nbt of event-entity
+	else:
+		set {_p} to "%tag ""canpick"" of nbt of event-item%"
+		if name of event-item is set:
+			Add "{CustomName:""%name of event-item% §7for %{_p}%"",CustomNameVisible:1}" To nbt of event-entity
+		else:
+			Add "{CustomName:""%event-item% §7for %{_p}%"",CustomNameVisible:1}" To nbt of event-entity
+
+on heal:
+	cancel event
+on food bar change:
+	cancel event
+on explode:
+	cancel event
+on death:
+	clear drops
+
+function delete_data_effect(e: entity):
+	set {_uuid} to uuid of {_e}
+	delete {atk.effect.%{_uuid}%::*}
+	delete {vic.effect.%{_uuid}%::*}
+	delete {etc.effect.%{_uuid}%::*}
+	delete {time.effect.%{_uuid}%::*}
+
+function delete_data_entity(e: entity):
+	set {_uuid} to uuid of {_e}
+
+	delete {atk.effect.%{_uuid}%::*}
+	delete {vic.effect.%{_uuid}%::*}
+	delete {etc.effect.%{_uuid}%::*}
+	delete {time.effect.%{_uuid}%::*}
+
+	delete {id::%{_uuid}%}
+	delete {name::%{_uuid}%}
+	delete {level::%{_uuid}%}
+	delete {team::%{_uuid}%}
+
+	delete {attack_rate::%{_uuid}%}
+	delete {attack_times::%{_uuid}%}
+	delete {heal_times::%{_uuid}%}
+	delete {attack::%{_uuid}%}
+	delete {stable::%{_uuid}%}
+	delete {crit_rate::%{_uuid}%}
+	delete {crit_damage::%{_uuid}%}
+	delete {diffence_resist::%{_uuid}%}
+	delete {heal::%{_uuid}%}
+	delete {attack_resist::%{_uuid}%}
+	delete {stable_resist::%{_uuid}%}
+	delete {crit_rate_resist::%{_uuid}%}
+	delete {crit_damage_resist::%{_uuid}%}
+	delete {diffence::%{_uuid}%}
+	delete {heal_rate::%{_uuid}%}
+
+	delete {attack_rise::%{_uuid}%}
+	delete {stable_rise::%{_uuid}%}
+	delete {crit_rate_rise::%{_uuid}%}
+	delete {crit_damage_rise::%{_uuid}%}
+	delete {diffence_resist_rise::%{_uuid}%}
+	delete {heal_rise::%{_uuid}%}
+	delete {attack_resist_rise::%{_uuid}%}
+	delete {stable_resist_rise::%{_uuid}%}
+	delete {crit_rate_resist_rise::%{_uuid}%}
+	delete {crit_damage_resist_rise::%{_uuid}%}
+	delete {diffence_rise::%{_uuid}%}
+	delete {heal_rate_rise::%{_uuid}%}
+
+	delete {hp_max::%{_uuid}%}
+	delete {hp_now::%{_uuid}%}
+	delete {shield_now::%{_uuid}%}
+
+function heal(mode: integer, healer: entity, patient: entity, heal: number, heal_rate: number):
+	set {_uuid} to uuid of {_patient}
+	set {_before} to {hp_now::%{_uuid}%}
+	set {_heal} to floor({_heal} * (10000 + {_heal_rate}) / 10000)
+	add {_heal} to {hp_now::%{_uuid}%}
+	if {hp_now::%{_uuid}%} > {hp_max::%{_uuid}%}:
+		set {hp_now::%{_uuid}%} to {hp_max::%{_uuid}%}
+	if {_patient} is a player:
+		set {_patient}'s health to {hp_now::%{_uuid}%} / {hp_max::%{_uuid}%} * 10
+	holo({_patient}, "&a♥ &a+&a&l%difference between {_before} and {hp_now::%{_uuid}%}%", 1 seconds)
+	actionbar_hp({_patient})
+
+function shield(mode: integer, healer: entity, patient: entity, heal: number, heal_rate: number):
+	set {_uuid} to uuid of {_patient}
+	set {_before} to {shield_now::%{_uuid}%}
+	set {_heal} to floor({_heal} * (10000 + {_heal_rate}) / 10000)
+	if {shield_now::%{_uuid}%} < {_heal}:
+		set {shield_now::%{_uuid}%} to {_heal}
+	if {_patient} is a player:
+		set {_patient}'s absorption hearts to {shield_now::%{_uuid}%} / {hp_max::%{_uuid}%} * 20
+	holo({_patient}, "&e♥ &e+&e&l%difference between {_before} and {shield_now::%{_uuid}%}%", 1 seconds)
+	actionbar_hp({_patient})
+
+function named_hp(e: entity):
+	set {_uuid} to uuid of {_e}
+	set {_shield} to ({shield_now::%{_uuid}%} / {hp_max::%{_uuid}%})
+	if {_shield} > 1:
+		if floor({_shield}) is divisible by 2:
+			set {_tex1} to "&6▏"
+			set {_tex2} to "&e▏"
+		else:
+			set {_tex1} to "&e▏"
+			set {_tex2} to "&6▏"
+		set {_s} to 30
+		set {_s2} to ({_shield} - floor({_shield})) * 30
+		set {_number} to 2 + floor({_shield})
+		set {_addtex} to "&8[&7×&f%{_number}%&8]"
+	else:
+		set {_s} to {_shield} * 30
+		set {_tex1} to "&e▏"
+		set {_h} to ({hp_now::%{_uuid}%} / {hp_max::%{_uuid}%}) * 30
+		set {_addtex} to ""
+	loop 30 times:
+		set {_HP_TXT::%loop-number%} to "&7▏"
+	loop {_h} times:
+		set {_HP_TXT::%loop-number%} to "&c▏"
+	loop {_s} times:
+		set {_HP_TXT::%loop-number%} to "%{_tex1}%"
+	loop {_s2} times:
+		set {_HP_TXT::%loop-number%} to "%{_tex2}%"
+	set {_lasttext} to "%{_HP_TXT::1}%%{_HP_TXT::2}%%{_HP_TXT::3}%%{_HP_TXT::4}%%{_HP_TXT::5}%%{_HP_TXT::6}%%{_HP_TXT::7}%%{_HP_TXT::8}%%{_HP_TXT::9}%%{_HP_TXT::10}%%{_HP_TXT::11}%%{_HP_TXT::12}%%{_HP_TXT::13}%%{_HP_TXT::14}%%{_HP_TXT::15}%%{_HP_TXT::16}%%{_HP_TXT::17}%%{_HP_TXT::18}%%{_HP_TXT::19}%%{_HP_TXT::20}%%{_HP_TXT::21}%%{_HP_TXT::22}%%{_HP_TXT::23}%%{_HP_TXT::24}%%{_HP_TXT::25}%%{_HP_TXT::26}%%{_HP_TXT::27}%%{_HP_TXT::28}%%{_HP_TXT::29}%%{_HP_TXT::30}%%{_addtex}%"
+	add "{CustomName:""%{_lasttext}%"",CustomNameVisible:1}" to nbt of {_e}
+	set {_hp} to {hp_now::%{_uuid}%}+{shield_now::%{_uuid}%}
+	wait 5 seconds
+	{_hp} is {hp_now::%{_uuid}%}+{shield_now::%{_uuid}%}
+	add "{CustomNameVisible:0}" to nbt of {_e}
+
+function holo(e: entity, text: string, time: timespan):
+	set {_uuid} to uuid of {_e}
+	set {_x} to random number between 0.3 and 0.9
+	chance of 50%:
+		set {_x} to random number between -0.3 and -0.9
+	set {_y} to random number between 0.7 and 2
+	set {_z} to random number between 0.3 and 0.9
+	chance of 50%:
+		set {_z} to random number between -0.3 and -0.9
+	bind hologram "%{_text}%" to {_e} for {_time} offset by {_x}, {_y}, {_z}
+
+
+
