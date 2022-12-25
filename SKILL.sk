@@ -1,0 +1,305 @@
+
+on spawn:
+	"%spawn reason%" is "egg"
+	cancel event
+
+function bullet_strate(e: entity, w: timespan):
+	set {_uuid} to uuid of {_e}
+	set gravity of {_e} to false
+	wait {_w}
+#	set velocity of {_e} to vector(0, 0, 0)
+	set gravity of {_e} to true
+	set {projectile.attack::%{_uuid}%} to {projectile.attack::%{_uuid}%} * 0.7
+
+function bullet_particle(id: string, num: integer, speed: number, x: number, y: number, z: number, e: entity):
+	while {_e} is alive:
+		particle({_id}, {_num}, {_speed}, {_x}, {_y}, {_z}, location of {_e})
+		wait 1 ticks
+
+function bullet_kill(e: entity, w: timespan):
+	wait {_w}
+	{_e} is not on ground
+	set {_uuid} to uuid of {_e}
+	delete {projectile.shooter::%{_uuid}%}
+	delete {projectile.id::%{_uuid}%}
+	delete {projectile.star::%{_uuid}%}
+	delete {projectile.level::%{_uuid}%}
+	delete {projectile.attack_times::%{_uuid}%}
+	delete {projectile.heal_times::%{_uuid}%}
+	delete {projectile.attack::%{_uuid}%}
+	delete {projectile.stable::%{_uuid}%}
+	delete {projectile.crit_rate::%{_uuid}%}
+	delete {projectile.crit_damage::%{_uuid}%}
+	delete {projectile.diffence_resist::%{_uuid}%}
+	delete {projectile.heal::%{_uuid}%}
+	delete {projectile.attack_rise::%{_uuid}%}
+	delete {projectile.stable_rise::%{_uuid}%}
+	delete {projectile.crit_rate_rise::%{_uuid}%}
+	delete {projectile.crit_damage_rise::%{_uuid}%}
+	delete {projectile.diffence_resist_rise::%{_uuid}%}
+	delete {projectile.heal_rise::%{_uuid}%}
+	kill {_e}
+
+function bullet_create(e: entity, shooter: entity, id: string, star: integer, level: integer, attack_times: integer, heal_times: integer, attack_rate: integer, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number, heal: number, attack_rise: number, stable_rise: number, crit_rate_rise: number, crit_damage_rise: number, diffence_rise: number, heal_rise: number):
+	set {_uuid} to uuid of {_e}
+	set {projectile.shooter::%{_uuid}%} to {_shooter}
+	set {projectile.id::%{_uuid}%} to {_id}
+	set {projectile.star::%{_uuid}%} to {_star}
+	set {projectile.level::%{_uuid}%} to {_level}
+	set {projectile.attack_times::%{_uuid}%} to {_attack_times}
+	set {projectile.heal_times::%{_uuid}%} to {_heal_times}
+	set {projectile.attack_rate::%{_uuid}%} to {_attack_rate}
+	set {projectile.attack::%{_uuid}%} to {_attack}
+	set {projectile.stable::%{_uuid}%} to {_stable}
+	set {projectile.crit_rate::%{_uuid}%} to {_crit_rate}
+	set {projectile.crit_damage::%{_uuid}%} to {_crit_damage}
+	set {projectile.diffence_resist::%{_uuid}%} to {_diffence_resist}
+	set {projectile.heal::%{_uuid}%} to {_heal}
+	set {projectile.attack_rise::%{_uuid}%} to {_attack_rise}
+	set {projectile.stable_rise::%{_uuid}%} to {_stable_rise}
+	set {projectile.crit_rate_rise::%{_uuid}%} to {_crit_rate_rise}
+	set {projectile.crit_damage_rise::%{_uuid}%} to {_crit_damage_rise}
+	set {projectile.diffence_resist_rise::%{_uuid}%} to {_diffence_resist_rise}
+	set {projectile.heal_rise::%{_uuid}%} to {_heal_rise}
+
+on left click:
+	set {_uuid} to uuid of player
+	set {_id} to "%tag ""id"" of nbt of {_tool}%"
+	set {_star} to "%tag ""star"" of nbt of {_tool}%" parsed as number
+	set {_lv} to "%tag ""level"" of nbt of {_tool}%" parsed as number
+	set {_attack_times} to "%tag ""attack_times"" of nbt of {_tool}%" parsed as number
+	set {_heal_times} to "%tag ""heal_times"" of nbt of {_tool}%" parsed as number
+	set {_attack_rate} to "%tag ""attack_rate"" of nbt of {_tool}%" parsed as number
+	set {_attack} to "%tag ""attack"" of nbt of {_tool}%" parsed as number
+	set {_stable} to "%tag ""stable"" of nbt of {_tool}%" parsed as number
+	set {_crit_rate} to "%tag ""crit_rate"" of nbt of {_tool}%" parsed as number
+	set {_crit_damage} to "%tag ""crit_damage"" of nbt of {_tool}%" parsed as number
+	set {_diffence_resist} to "%tag ""diffence_resist"" of nbt of {_tool}%" parsed as number
+	set {_heal} to "%tag ""heal"" of nbt of {_tool}%" parsed as number
+	set {_attack_rise} to "%tag ""attack_rise"" of nbt of {_tool}%" parsed as number
+	set {_stable_rise} to "%tag ""stable_rise"" of nbt of {_tool}%" parsed as number
+	set {_crit_rate_rise} to "%tag ""crit_rate_rise"" of nbt of {_tool}%" parsed as number
+	set {_crit_damage_rise} to "%tag ""crit_damage_rise"" of nbt of {_tool}%" parsed as number
+	set {_diffence_resist_rise} to "%tag ""diffence_resist_rise"" of nbt of {_tool}%" parsed as number
+	set {_heal_rise} to "%tag ""heal_rise"" of nbt of {_tool}%" parsed as number
+
+on right click:
+	set {_tool} to player's tool
+	set {_uuid} to uuid of player
+	set {_id} to "%tag ""id"" of nbt of {_tool}%"
+	set {_star} to "%tag ""star"" of nbt of {_tool}%" parsed as number
+	set {_lv} to "%tag ""level"" of nbt of {_tool}%" parsed as number
+	set {_attack_times} to "%tag ""attack_times"" of nbt of {_tool}%" parsed as number
+	set {_heal_times} to "%tag ""heal_times"" of nbt of {_tool}%" parsed as number
+	set {_attack_rate} to "%tag ""attack_rate"" of nbt of {_tool}%" parsed as number
+	set {_attack} to "%tag ""attack"" of nbt of {_tool}%" parsed as number
+	set {_stable} to "%tag ""stable"" of nbt of {_tool}%" parsed as number
+	set {_crit_rate} to "%tag ""crit_rate"" of nbt of {_tool}%" parsed as number
+	set {_crit_damage} to "%tag ""crit_damage"" of nbt of {_tool}%" parsed as number
+	set {_diffence_resist} to "%tag ""diffence_resist"" of nbt of {_tool}%" parsed as number
+	set {_heal} to "%tag ""heal"" of nbt of {_tool}%" parsed as number
+	set {_attack_rise} to "%tag ""attack_rise"" of nbt of {_tool}%" parsed as number
+	set {_stable_rise} to "%tag ""stable_rise"" of nbt of {_tool}%" parsed as number
+	set {_crit_rate_rise} to "%tag ""crit_rate_rise"" of nbt of {_tool}%" parsed as number
+	set {_crit_damage_rise} to "%tag ""crit_damage_rise"" of nbt of {_tool}%" parsed as number
+	set {_diffence_resist_rise} to "%tag ""diffence_resist_rise"" of nbt of {_tool}%" parsed as number
+	set {_heal_rise} to "%tag ""heal_rise"" of nbt of {_tool}%" parsed as number
+
+	if {_id} is "eb.tool":
+		cancel event
+		if player is sneaking:
+			if {score.off::%{_uuid}%} is not set:
+				set {score.off::%{_uuid}%} to 1
+				send "&7エフェクトボードを停止しました" to player
+		else:
+			if {score.off::%{_uuid}%} is 1:
+				delete {score.off::%{_uuid}%}
+				send "&7エフェクトボードを起動しました" to player
+			if {score.target::%{_uuid}%} is set:
+				delete {score.target::%{_uuid}%}
+				send "&7エフェクトボードの対象設定を自動切り替えに変更しました" to player
+		stop
+
+	if {_id} is "light.gun":
+		if {cooldown.%{_id}%::%{_uuid}%} is not set:
+			set {cooldown.%{_id}%::%{_uuid}%} to now
+		if player is sneaking:
+			set {_n} to 5
+		else:
+			set {_n} to 1
+		difference between now and {cooldown.%{_id}%::%{_uuid}%} > "%3*{_n}% ticks" parsed as timespan
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		set cooldown of player's tool of player to 3*{_n}
+		loop {_n} times:
+#			food level of player > 0.5
+			shoot arrow at speed 2.5
+			set {_e} to last shot projectile
+			bullet_create({_e}, player, {_id}, {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+			bullet_kill({_e}, 5 seconds)
+#			bullet_particle("END_ROD", 1, 0, 0, 0, 0, {_e})
+			sound(player, "block.dispenser.launch", 0.4, 1.4)
+			make {_e} glow for player
+			cost(player, 0.5)
+			wait 1 ticks
+		stop
+
+	if {_id} is "bond.gun":
+		if {cooldown.%{_id}%::%{_uuid}%} is not set:
+			set {cooldown.%{_id}%::%{_uuid}%} to now
+		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+#		food level of player > 5
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		set cooldown of player's tool of player to 60
+		shoot arrow at speed 1.8
+		set {_e} to last shot projectile
+		bullet_create({_e}, player, {_id}, {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+		sound(player, "entity.shulker.shoot", 1, 1.2)
+		bullet_kill({_e}, 5 seconds)
+		bullet_particle("FLAME", 1, 0, 0, 0, 0, {_e})
+		make {_e} glow for player
+		cost(player, 5)
+		stop
+
+	if {_id} is "lambic.gun":
+		if {cooldown.%{_id}%::%{_uuid}%} is not set:
+			set {cooldown.%{_id}%::%{_uuid}%} to now
+		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+#		food level of player > 5
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		set cooldown of player's tool of player to 60
+		shoot egg at speed 1.8
+		set {_e} to last shot projectile
+		bullet_create({_e}, player, {_id}, {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+		sound(player, "entity.shulker.shoot", 1, 1.2)
+		bullet_kill({_e}, 5 seconds)
+		bullet_particle("FLAME", 1, 0, 0, 0, 0, {_e})
+		make {_e} glow for player
+		cost(player, 5)
+		stop
+
+	if {_id} is "rabbit.gun":
+		if {cooldown.%{_id}%::%{_uuid}%} is not set:
+			set {cooldown.%{_id}%::%{_uuid}%} to now
+		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+#		food level of player > 5
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		set cooldown of player's tool of player to 60
+		shoot snowball at speed 1.8
+		set {_e} to last shot projectile
+		bullet_create({_e}, player, {_id}, {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+		sound(player, "entity.shulker.shoot", 1, 1.2)
+		bullet_kill({_e}, 5 seconds)
+		bullet_particle("FLAME", 1, 0, 0, 0, 0, {_e})
+		make {_e} glow for player
+		cost(player, 5)
+		stop
+
+	if {_id} is "rapidrate.gun":
+		if {cooldown.%{_id}%::%{_uuid}%} is not set:
+			set {cooldown.%{_id}%::%{_uuid}%} to now
+		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+#		food level of player > 5
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		set cooldown of player's tool of player to 60
+		shoot arrow at speed 3.5
+		set {_e} to last shot projectile
+		bullet_create({_e}, player, {_id}, {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+		sound(player, "block.dispenser.launch", 0.4, 1.4)
+		bullet_strate({_e}, 10 ticks)
+#		long_particle("END_ROD", 1, 0.01, 0, 0, 0, {_e}, 10, 1 ticks)
+		bullet_kill({_e}, 5 seconds)
+		add vector(random number between -0.07 and 0.07, random number between -0.07 and 0.07, random number between -0.07 and 0.07) to velocity of {_e}
+		make {_e} glow for player
+		cost(player, 0.5)
+		stop
+
+	if {_id} is "nuro.gun":
+#		set {_span} to difference between {span_last.%{_id}%::%{_uuid}%} and now
+#		set {span_last.%{_id}%::%{_uuid}%} to now
+#		span({_span}) is 1
+		if {cooldown.%{_id}%::%{_uuid}%} is not set:
+			set {cooldown.%{_id}%::%{_uuid}%} to now
+		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0.15 seconds
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		cost(player, 0.5)
+		loop 4 times:
+#			food level of player > 0.5
+			shoot arrow at speed 1.8
+			set {_e} to last shot projectile
+			bullet_create({_e}, player, {_id}, {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+			bullet_kill({_e}, 5 seconds)
+			sound(player, "block.dispenser.launch", 0.4, 1.4)
+			add vector(random number between -0.15 and 0.15, random number between -0.15 and 0.15, random number between -0.15 and 0.15) to velocity of {_e}
+			make {_e} glow for player
+			wait 1 ticks
+		stop
+
+	if {_id} is "crea.gun":
+		if {cooldown.%{_id}%::%{_uuid}%} is not set:
+			set {cooldown.%{_id}%::%{_uuid}%} to now
+		set {_span} to difference between now and {cooldown.%{_id}%::%{_uuid}%}
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		if 0.3 seconds < {_span}:
+			if {charge.%{_id}%::%{_uuid}%} is set:
+				send title "" with subtitle "" to player
+				shoot snowball at speed 1.3
+				set {_e} to last shot projectile
+				bullet_create({_e}, player, {_id}, {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+				bullet_kill({_e}, 5 seconds)
+				sound(player, "entity.shulker.shoot", 1, 1.2)
+				set {_uuid.p} to uuid of {_e}
+				set {projectile.crea::%{_uuid.p}%} to {charge.%{_id}%::%{_uuid}%}
+				make {_e} glow for player
+				delete {charge.%{_id}%::%{_uuid}%}
+			else:
+#				food level of player > 1
+				cost(player, 1)
+				add 1 to {charge.%{_id}%::%{_uuid}%}
+				sound(player, "entity.pig.step", 3, 1.5)
+				send title "" with subtitle "&e%{charge.%{_id}%::%{_uuid}%}%" to player with fadein 0 ticks
+		else if 0.1 seconds < {_span}:
+			{charge.%{_id}%::%{_uuid}%} < 10
+#			food level of player > 1
+			cost(player, 1)
+			add 1 to {charge.%{_id}%::%{_uuid}%}
+			send title "" with subtitle "&e%{charge.%{_id}%::%{_uuid}%}%" to player with fadein 0 ticks
+			if {charge.%{_id}%::%{_uuid}%} is 10:
+				sound(player, "block.iron_trapdoor.close", 1, 0.6)
+				send title "" with subtitle "&c%{charge.%{_id}%::%{_uuid}%}%" to player for 5 seconds with fadein 0 ticks and fadeout 5 seconds
+				exit 2 sections
+			else:
+				sound(player, "entity.pig.step", 3, 2)
+		else:
+			stop
+		set {_charge} to {charge.%{_id}%::%{_uuid}%}
+		set {charge_keep_time.%{_id}%::%{_uuid}%} to now
+		wait 0.3 seconds
+		{charge.%{_id}%::%{_uuid}%} is {_charge}
+		if {charge.%{_id}%::%{_uuid}%} is not 10:
+			sound(player, "block.iron_trapdoor.close", 1, 0.6)
+		send title "" with subtitle "&c%{charge.%{_id}%::%{_uuid}%}%" to player for 5 seconds with fadein 0 ticks and fadeout 5 seconds
+		wait 10 seconds
+		{charge.%{_id}%::%{_uuid}%} is {_charge}
+		difference between now and {charge_keep_time.%{_id}%::%{_uuid}%} >= 10 seconds
+		delete {charge.%{_id}%::%{_uuid}%}
+		delete {charge_keep_time.%{_id}%::%{_uuid}%}
+		send title "" with subtitle "&7チャージがリセットされました" to player for 2 seconds with fadein 0 seconds and fadeout 10 ticks
+		sound(player, "block.sand.break", 2, 1.4)
+
+function cost(p: player, c: number):
+	set {_uuid} to uuid of {_p}
+	remove {_c} from food level of {_p}
+	set {_p}'s walk speed to 0.2
+	delete {cost_check::%{_uuid}%}
+	actionbar_hp({_p})
+	add 1 to {cost_stop::%{_uuid}%}
+	set {_n} to {cost_stop::%{_uuid}%}
+	wait 10 ticks
+	{_n} is {cost_stop::%{_uuid}%}
+	delete {cost_stop::%{_uuid}%}
+
+function span(span: timespan) :: integer:
+	if 0.1 seconds < {_span}:
+		if {_span} < 0.3 seconds:
+			return 1
+			stop
