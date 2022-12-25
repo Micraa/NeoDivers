@@ -1,0 +1,226 @@
+on right click:
+	player's tool is bone
+	open chest with 4 row named "&8Skript reload" to player
+	set slot 0 of player's current inventory to black stained glass pane named "&f&lALL"
+	loop {skript::*}:
+		add 1 to {_n}
+		set slot {_n} of player's current inventory to {skript_ui::%{_n}%} named "%loop-value%"
+
+on inventory click:
+	if name of player's current inventory is "&8Skript reload":
+		event-item is set
+		sound(player, "entity.chicken.step", 1, 1)
+		cancel event
+		if name of event-item is "&f&lALL":
+			execute player command "/l"
+			close player's inventory
+			stop
+		execute player command "/l %name of event-item%"
+
+on load:
+	set {skript::*} to "SYSTEM", "DEVELOP", "PARTICLE", "DAMAGE", "PROJECTILE", "SKILL", "ITEM", "ELEMENT", "ENTITY", "MAP" and "GUI"
+	set {skript_ui::*} to impulse command block, pieces of paper, blaze powder, fire charge, arrow, iron sword, diamond, potion, zombie spawn egg, filled map and chest
+
+command /ll:
+	permission: skript.admin
+	trigger:
+		set {_time} to now
+		broadcast ""
+		broadcast "&6&lRoading Skript..."
+		execute player command "/sk reload scripts"
+		broadcast "&e&l%difference between {_time} and now% &6&lto complete."
+
+command /l [<text>]:
+	permission: skript.admin
+	trigger:
+		set {_time} to now
+		broadcast ""
+		broadcast "&6&lRoading Skript..."
+		if arg 1 is not set:
+			loop {skript::*}:
+				execute player command "/sk reload %loop-value%"
+				wait 10 ticks
+		else:
+			execute player command "/sk reload %arg-1%"
+		broadcast "&e&l%difference between {_time} and now% &6&lto complete."
+
+command /mdlink:
+	trigger:
+		if difference between {linkcodelimit::%{mdcode.%uuid of player%}%} and now < 5 minutes:
+			send "あなたのコードは &a%{mdcode.%uuid of player%}% &rです"
+			send "このサーバーのDiscord内の &f&l連携｜link &rというチャンネルで"
+			send "&e  /link %{mdcode.%uuid of player%}% &rと入力してください このコードの&c有効期限は5分&rです"
+			set {linkcodelimit::%{mdcode.%uuid of player%}%} to now
+			stop
+		set {mdcode.%uuid of player%} to a random integer between 11111 and 99999
+		while {linkcode::%{mdcode.%uuid of player%}%} is set:
+			set {mdcode.%uuid of player%} to a random integer between 11111 and 99999
+		set {linkcode::%{mdcode.%uuid of player%}%} to player
+		send "あなたのコードは &a%{mdcode.%uuid of player%}% &rです"
+		send "このサーバーのDiscord内の &f&l連携｜link &rというチャンネルで"
+		send "&e  /link %{mdcode.%uuid of player%}% &rと入力してください このコードの&c有効期限は5分&rです"
+		set {linkcodelimit::%{mdcode.%uuid of player%}%} to now
+
+discord command /link [<text>]:
+	trigger:
+		if discord id of event-channel is not {id.link}:
+			delete event-message with "NeoDivers-BOT"
+			stop
+		if arg-1 is not set:
+			reply with "MCサーバー内で発行されたコードを記述してください"
+			stop
+		if {linkcode::%arg-1%} is not set:
+			reply with "存在しないコードです 正確に入力されているか確認してください"
+			stop
+		if difference between {linkcodelimit::%arg-1%} and now > 5 minutes:
+			reply with "有効期限が切れたコードです MCサーバー内でもう一度コードを発行してください"
+			delete {linkcode::%arg-1%}
+			stop
+		if {linked::%discord id of event-member%} is set:
+			reply with "MCID ""%{linked::%discord id of event-member%}%"" との連携を解除して"
+			reply with "MCID ""%{linkcode::%arg-1%}%"" と連携しました"
+		else:
+			reply with "MCID ""%{linkcode::%arg-1%}%"" との連携に成功しました"
+		set {linked::%discord id of event-member%} to {linkcode::%arg-1%}
+		add role with id "939744914135199826" to roles of event-member
+		delete {linkcode::%arg-1%}
+		set {_player} to {linked::%discord id of event-member%} parsed as player
+		set {_uuid} to uuid of {_player}
+		delete {linkcodelimit::%{mdcode.%{_uuid}%}%}
+		delete {mdcode.%{_uuid}%}
+
+command /mdre [<number>]:
+	trigger:
+		delete {linkcode::%arg-1%}
+		delete {linkcodelimit::%{mdcode.%uuid of player%}%}
+		delete {mdcode.%uuid of player%}
+
+discord command /check [<user>]:
+	trigger:
+		if discord id of event-channel is not {id.close}:
+			delete event-message with "NeoDivers-BOT"
+			stop
+		wait 10 ticks
+		reply with "%arg-1% は `%{linked::%discord id of arg-1%}%` と連携しています"
+
+options:
+	token: MTAwNjQ0NzQ5MzE0OTYzNDU5MA.Gkh3Ht.vovPkJ59650VT5gVA9WhbE5iToj7OGBFFwjvaY
+	botname: NeoDivers-BOT
+
+on load:
+	set {owner} to "0e4c2997-4001-49f2-8911-05a8ba630d5f" parsed as offline player
+
+#discord command /set1:
+#	trigger:
+#		set {id.open} to discord id of event-channel
+#		set {id.owner} to discord id of event-user
+#		send "Setup Success" to event-channel with "{@botname}"
+#discord command /set2:
+#	trigger:
+#		set {id.close} to discord id of event-channel
+#		set {id.owner} to discord id of event-user
+#		send "Setup Success" to event-channel with "{@botname}"
+#discord command /set3:
+#	trigger:
+#		set {id.link} to discord id of event-channel
+#		set {id.owner} to discord id of event-user
+#		send "Setup Success" to event-channel with "{@botname}"
+#on voice channel join:
+#	set {id.info} to discord id of event-channel
+
+on script load:
+	if online status of "{@botname}" is not online:
+		login to "{@token}" with name "{@botname}"
+	wait 3 seconds
+	set discord name of channel with id {id.info} to "✅サーバー起動中" with "{@botname}"
+
+on script stop:
+	set discord name of channel with id {id.info} to "🛑サーバー停止中" with "{@botname}"
+
+on chat:
+	cancel event
+	broadcast "%player% &8》&r%message% &7(%now formatted as ""HH:mm:ss""%&7)"
+	replace all "§r", "§m", "§n", "§k", "§o", "§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d" and "§e" with "" in message
+	send "**%player%**: %message% (%now formatted as ""HH:mm:ss""%)" to channel with id {id.open} with "{@botname}"
+	send "**%player%**: %message% (%now formatted as ""HH:mm:ss""%)" to channel with id {id.close} with "{@botname}"
+
+on message received:
+	if discord id of event-channel is {id.open}:
+		if "%event-member%" is not "{@botname}":
+			set {_t} to event-text
+			replace all "*", "`", "||", ">" and "~~" with "" in {_t}
+			broadcast "%event-member% &b》&r%{_t}% &7(from Discord) (%now formatted as ""HH:mm:ss""%)"
+
+on command:
+	the player is a player
+	send "&6* &7%player% &7: /%full command% &7(%now formatted as ""HH:mm:ss""%&7)" to {owner}
+	send "**%player%**: /%full command% (%now formatted as ""HH:mm:ss""%)" to channel with id {id.close} with "{@botname}"
+
+function comma(int: number) :: text:
+	set {_Coins} to "%{_int}%"
+	set {_length} to length of {_Coins}
+	if {_length} >= 3:
+		set {_mod} to {_length} mod 3
+		if {_mod} is 0:
+			set {_groups::*} to groups 1 of {_Coins} matched to "([0-9]{3})"
+			set {_Coins} to join {_groups::*} with ","
+		else:
+			set {_1} to the first {_mod} characters of {_Coins}
+			set {_2} to subtext of {_Coins} from characters ({_mod}+1) to {_length}
+			set {_groups::*} to groups 1 of {_2} matched to "([0-9]{3})"
+			set {_Coins} to "%{_1}%,%join {_groups::*} with "",""%"
+	return {_Coins}
+
+command /gm [<integer>]:
+	permission: skript.admin
+	trigger:
+		if arg 1 is 0:
+			set the player's gamemode to survival
+		if arg 1 is 1:
+			set the player's gamemode to creative
+		if arg 1 is 2:
+			set the player's gamemode to adventure
+		if arg 1 is 3:
+			set the player's gamemode to spectator
+
+command /fast [<text>] [<number>]: #高速移動
+	permission: skript.admin
+	trigger:
+		if arg 1 is not set:
+			if {fast.%player%} is 1:
+				send "&6高速移動を解除しました(通常速度になりました) &7(/fast help)" to player
+				set the player's fly speed to 0.1
+				set the player's walk speed to 0.2
+				clear {fast.%player%}
+				stop
+			if {fast.%player%} is not set:
+				if arg 1 is "2":
+					send "&6高速移動を有効にしました &7(/fast help)" to player
+					set the player's fly speed to 0.5
+					set the player's walk speed to 0.7
+					set {fast.%player%} to 1
+					stop
+				else:
+					send "&6高速移動を有効にしました &7(/fast help)" to player
+					set the player's fly speed to 0.3
+					set the player's walk speed to 0.5
+					set {fast.%player%} to 1
+					stop
+		if arg 1 is "walk":
+			if arg 2 is set:
+				set the player's walk speed to arg 2
+				set {fast.%player%} to 1
+				send "&6歩き移動の速度を変更しました &e/fast &6で通常速度に戻せます" to player
+			else:
+				send "&c数値を入力してください &7(/fast help)" to player
+		if arg 1 is "fly":
+			if arg 2 is set:
+				set the player's fly speed to arg 2
+				set {fast.%player%} to 1
+				send "&6飛行移動の速度を変更しました &e/fast &6で通常速度に戻せます" to player
+			else:
+				send "&c数値を入力してください &7(/fast help)" to player
+		if arg 1 is "help":
+			send "&6/fast &e高速移動を 有効/無効 にする" to player
+			send "&6/fast walk <number> &e歩き移動の速度を変更 &7(<number>のデフォルトは0.2)" to player
+			send "&6/fast fly <number> &e飛行移動の速度を変更 &7(<number>のデフォルトは0.1)" to player
