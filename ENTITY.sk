@@ -1,0 +1,123 @@
+
+command /spawn [<text>] [<integer>] [<integer>]:
+	permission: skript.admin
+	trigger:
+		if arg-2 is not set:
+			set {_l} to 1
+		else:
+			set {_l} to arg-2
+		if arg-3 is not set:
+			set {_n} to 1
+		else:
+			set {_n} to arg-3
+		loop {_n} times:
+			spawn(arg-1, {_l}, block 1 meter above location of event-block)
+			spawn(arg-1, {_l}, block 1 meter above location of player)
+
+on right click:
+	player's tool is stick
+	if player's target is set:
+		set {_entity} to player's target
+	else:
+		set {_entity} to player
+	set {_uuid} to uuid of {_entity}
+	loop {atk.effect.%{_uuid}%::*}:
+		set {_value::*} to loop-value split at "|"
+		send "%{_value::5}%" to player
+	loop {vic.effect.%{_uuid}%::*}:
+		set {_value::*} to loop-value split at "|"
+		send "%{_value::5}%" to player
+
+function skill_holo(e: entity, h: number, text: string, time: timespan):
+	bind hologram "%{_text}%" to {_e} for {_time} offset by 0, {_h}, 0
+
+function data_id(e: entity, id: string, name: string, level: number, attack_times: number, heal_times: number, hp_max: number, hp_now: number, shield_now: number):
+	set {_uuid} to uuid of {_e}
+	set {id::%{_uuid}%} to {_id}
+	set {name::%{_uuid}%} to {_name}
+	set {level::%{_uuid}%} to {_level}
+	set {attack_times::%{_uuid}%} to {_attack_times}
+	set {heal_times::%{_uuid}%} to {_heal_times}
+	set {hp_max::%{_uuid}%} to {_hp_max}
+	set {hp_now::%{_uuid}%} to {_hp_now}
+	set {shield_now::%{_uuid}%} to {_shield_now}
+
+function data_base(e: entity, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number, heal: number, attack_resist: number, stable_resist: number, crit_rate_resist: number, crit_damage_resist: number, diffence: number, heal_rate: number):
+	set {_uuid} to uuid of {_e}
+	set {attack::%{_uuid}%} to {_attack}
+	set {stable::%{_uuid}%} to {_stable}
+	set {crit_rate::%{_uuid}%} to {_crit_rate}
+	set {crit_damage::%{_uuid}%} to {_crit_damage}
+	set {diffence_resist::%{_uuid}%} to {_diffence_resist}
+	set {heal::%{_uuid}%} to {_heal}
+	set {attack_resist::%{_uuid}%} to {_attack_resist}
+	set {stable_resist::%{_uuid}%} to {_stable_resist}
+	set {crit_rate_resist::%{_uuid}%} to {_crit_rate_resist}
+	set {crit_damage_resist::%{_uuid}%} to {_crit_damage_resist}
+	set {diffence::%{_uuid}%} to {_diffence}
+	set {heal_rate::%{_uuid}%} to {_heal_rate}
+
+function data_rise(e: entity, attack_rise: number, stable_rise: number, crit_rate_rise: number, crit_damage_rise: number, diffence_resist_rise: number, heal_rise: number, attack_resist_rise: number, stable_resist_rise: number, crit_rate_resist_rise: number, crit_damage_resist_rise: number, diffence_rise: number, heal_rate_rise: number):
+	set {_uuid} to uuid of {_e}
+	set {attack_rise::%{_uuid}%} to {_attack_rise}
+	set {stable_rise::%{_uuid}%} to {_stable_rise}
+	set {crit_rate_rise::%{_uuid}%} to {_crit_rate_rise}
+	set {crit_damage_rise::%{_uuid}%} to {_crit_damage_rise}
+	set {diffence_resist_rise::%{_uuid}%} to {_diffence_resist_rise}
+	set {heal_rise::%{_uuid}%} to {_heal_rise}
+	set {attack_resist_rise::%{_uuid}%} to {_attack_resist_rise}
+	set {stable_resist_rise::%{_uuid}%} to {_stable_resist_rise}
+	set {crit_rate_resist_rise::%{_uuid}%} to {_crit_rate_resist_rise}
+	set {crit_damage_resist_rise::%{_uuid}%} to {_crit_damage_resist_rise}
+	set {diffence_rise::%{_uuid}%} to {_diffence_rise}
+	set {heal_rate_rise::%{_uuid}%} to {_heal_rate_rise}
+
+function spawn(id: string, level: integer, loc: location):
+	if {_id} is "noai":
+		spawn zombie at {_loc}
+		add "{NoAI:1b,Silent:1b}" to nbt of last spawned entity
+		data_id(last spawned entity, {_id}, "&c&lNoAI &8[&7Lv.&f%{_level}%&8]", {_level}, 1, 0, (10000 + ({_level} * 1000)), (10000 + ({_level} * 1000)), (10000 + ({_level} * 1000)))
+		data_base(last spawned entity, (1000 + ({_level} * 100)), 5000, 5000, 5000, 5000, 1000, 0, 0, 0, 0, 5000, 10000)
+		data_rise(last spawned entity, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+	if {_id} is "zombie":
+		spawn zombie at {_loc}
+		add "{Silent:1b,PersistenceRequired:1b,CanPickUpLoot:0b}" to nbt of last spawned entity
+		data_id(last spawned entity, {_id}, "&c&lZMB-M &8[&7Lv.&f%{_level}%&8]", {_level}, 1, 0, (1000 + ({_level} * 100)), (1000 + ({_level} * 100)), (1000 + ({_level} * 100)))
+		data_base(last spawned entity, (1000 + ({_level} * 100)), 5000, 4000, 15000, 0, 0, 0, 0, 0, 0, 5000, 10000)
+		#atk:1, stb:2, c_rate:3, c_damage:4, def_res:5, heal:6, atk_res:7, stb_res:8, c_rate_res:9, c_damage_res:10, def:11, heal_rate:12 
+		data_rise(last spawned entity, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+#sumple: effect(1, {_e}, "atk", {_e}, "zombie-1", "attack", "rate", 1.1, 10, "&c攻撃力上昇⬆&8: &c10&7%%", "good", 255, 80, 80)
+#ver: rate/num, type: atk
+function effect(mode: integer, a: entity, v: string, e: entity, id: string, type: string, ver: string, value: number, time: number, text: string, or: string, r: integer, g: integer, b: integer):
+	set {_uuid} to uuid of {_e}
+	set {_uuid.a} to uuid of {_a}
+	holo({_e}, "%{_text}%", 2 seconds)
+	if {%{_v}%.effect.%{_uuid}%::%{_id}%} is set:
+		set {time.effect.%{_uuid}%::%{_id}%} to {_time}
+		stop
+
+	set {%{_v}%.effect.%{_uuid}%::%{_id}%} to "%{_id}%|%{_ver}%|%{_type}%|%{_value}%|%{_text}%|%{_or}%"
+	set {time.effect.%{_uuid}%::%{_id}%} to {_time}
+	set {_prticle} to "%{_id}%|%uuid of {_e}%"
+#	drawComplexCircle particle "redstone", RGB {_r}, {_g}, {_b}, center {_e}, id "%{_prticle}%", rainbowMode false, randomRotation true, radius 1.5, density 50, start random integer between 0 and 100, visibleRange 50
+
+	while {time.effect.%{_uuid}%::%{_id}%} > 0:
+		wait 1 seconds
+		remove 1 from {time.effect.%{_uuid}%::%{_id}%}
+		if {_type} is "regeneration":
+			if {_ver} is "addition":
+				heal({_mode}, {_a}, {_e}, floor({_value} * (10000 + {heal_rise::%{_uuid}%}) / 10000) , floor({heal_rate::%{_uuid}%} * (10000 + {heal_rate_rise::%{_uuid}%}) / 10000))
+			if {_ver} is "direct":
+				heal({_mode}, {_a}, {_e}, {_value}, {heal_rate::%{_uuid}%})
+		if {_type} is "poison":
+			if {_ver} is "rate":
+				damage({_mode}, {_a}, {_e}, {_value})
+			if {_ver} is "number":
+				damage({_mode}, {_a}, {_e}, {_value})
+		{_e} is not alive
+		exit 1 loop
+	stopEffect id "%{_prticle}%"
+#	particle(10, "SPELL_INSTANT", 0.1, 0, 0, 0, location of {_e})
+	delete {%{_v}%.effect.%{_uuid}%::%{_id}%}
+	delete {time.effect.%{_uuid}%::%{_id}%}
