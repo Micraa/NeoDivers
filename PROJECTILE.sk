@@ -1,0 +1,267 @@
+
+function combo(mode: number, attacker: player, victim: entity):
+	set {_uuid} to uuid of {_attacker}
+	add 1 to {combo::%{_uuid}%}
+	set {_combo} to {combo::%{_uuid}%}
+#	soundloc({_attacker}, location of {_victim}, "block.note.basedrum", 100, 1.4)
+	if {_mode} is 1:
+		send title "" with subtitle "&f%{_combo}%" to {_attacker} for 3 seconds with fade in 0 ticks and fade out 0 ticks
+		wait 2 ticks
+		send title "" with subtitle "&7%{_combo}%" to {_attacker} for 3 seconds with fade in 0 ticks and fade out 3 ticks
+	if {_mode} is 2:
+		send title "" with subtitle "&7(&f%{_combo}%&7)" to {_attacker} for 3 seconds with fade in 0 ticks and fade out 0 ticks
+		wait 2 ticks
+		send title "" with subtitle "&7(%{_combo}%&7)" to {_attacker} for 3 seconds with fade in 0 ticks and fade out 3 ticks
+	wait 3 seconds
+	if {_combo} is {combo::%{_uuid}%}:
+		delete {combo::%{_uuid}%}
+
+function projectile_hit(mode: integer, attacker: player, victim: entity):
+	set {_uuid} to uuid of {_attacker}
+	if {_mode} is 1:
+		combo(1, {_attacker}, {_victim})
+		soundloc({_attacker}, location of {_victim}, "entity.itemframe.add_item", 100, 1.4)
+#		make {_victim} glow with color "RED" for {_attacker}
+#		wait 2 ticks
+#		make {_victim} glow with color "none" for {_attacker}
+		make {_victim} glow for {_attacker}
+		wait 2 ticks
+		make {_victim} unglow for {_attacker}
+	if {_mode} is 2:
+		soundloc({_attacker}, location of {_victim}, "entity.itemframe.add_item", 100, 1.4)
+#		make {_victim} glow with color "GREEN" for all players
+#		wait 2 ticks
+#		make {_victim} glow with color "NONE" for all players
+	if {_mode} is 3:
+		combo(2, {_attacker}, {_victim})
+		soundloc({_attacker}, location of {_victim}, "entity.itemframe.add_item", 100, 1.4)
+#		make {_victim} glow with color "RED" for {_attacker}
+#		wait 2 ticks
+#		make {_victim} glow with color "none" for {_attacker}
+		make {_victim} glow for {_attacker}
+		wait 2 ticks
+		make {_victim} unglow for {_attacker}
+
+on projectile collide:
+	set {_uuid.p} to uuid of event-projectile
+	set {_uuid.v} to uuid of event-entity
+	set {_attacker} to {projectile.shooter::%{_uuid.p}%}
+	{_attacker} is a player
+	set {_uuid.a} to uuid of {_attacker}
+	set {_id} to {projectile.id::%{_uuid.p}%}
+	set {_star} to {projectile.star::%{_uuid.p}%}
+	set {_level} to {projectile.level::%{_uuid.p}%}
+	set {_attack_rate} to {projectile.attack_rate::%{_uuid.p}%}
+	set {_attack_times} to {projectile.attack_times::%{_uuid.p}%}
+	set {_heal_times} to {projectile.heal_times::%{_uuid.p}%}
+	set {_damage} to 1
+	set {_team.a} to {team::%{_uuid.a}%}
+	set {_team.v} to {team::%{_uuid.v}%}
+
+	set {_attack} to ({attack::%{_uuid.a}%} + {projectile.attack::%{_uuid.p}%}) * (10000 + {attack_rise::%{_uuid.a}%} + {projectile.attack_rise::%{_uuid.p}%}) / 10000
+	set {_stable} to ({stable::%{_uuid.a}%} + {projectile.stable::%{_uuid.p}%}) * (10000 + {stable_rise::%{_uuid.a}%} + {projectile.stable_rise::%{_uuid.p}%}) / 10000
+	set {_crit_rate} to ({crit_rate::%{_uuid.a}%} + {projectile.crit_rate::%{_uuid.p}%}) * (10000 + {crit_rate_rise::%{_uuid.a}%} + {projectile.crit_rate_rise::%{_uuid.p}%}) / 10000
+	set {_crit_damage} to ({crit_damage::%{_uuid.a}%} + {projectile.crit_damage::%{_uuid.p}%}) * (10000 + {crit_damage_rise::%{_uuid.a}%} + {projectile.crit_damage_rise::%{_uuid.p}%}) / 10000
+	set {_diffence_resist} to ({diffence_resist::%{_uuid.a}%} + {projectile.diffence_resist::%{_uuid.p}%}) * (10000 + {diffence_resist_rise::%{_uuid.a}%} + {projectile.diffence_resist_rise::%{_uuid.p}%}) / 10000
+	set {_heal} to (({heal::%{_uuid.a}%} + {projectile.heal::%{_uuid.p}%}) * (10000 + {heal_rise::%{_uuid.a}%} + {projectile.heal_rise::%{_uuid.p}%}) / 10000)
+	set {_attack_resist} to {attack_resist::%{_uuid.v}%} * (10000 + {attack_resist_rise::%{_uuid.v}%}) / 10000
+	set {_stable_resist} to {stable_resist::%{_uuid.v}%} * (10000 + {stable_resist_rise::%{_uuid.v}%}) / 10000
+	set {_crit_rate_resist} to {crit_rate_resist::%{_uuid.v}%} * (10000 + {crit_rate_resist_rise::%{_uuid.v}%}) / 10000
+	set {_crit_damage_resist} to {crit_damage_resist::%{_uuid.v}%} * (10000 + {crit_damage_resist_rise::%{_uuid.v}%}) / 10000
+	set {_diffence} to {diffence::%{_uuid.v}%} * (10000 + {diffence_rise::%{_uuid.v}%}) / 10000
+	set {_heal_rate} to {heal_rate::%{_uuid.v}%} * (10000 + {heal_rate_rise::%{_uuid.v}%}) / 10000
+
+#	broadcast "atk:%{_attack}%, Ratk:%{_attack_resist}%, stb:%{_stable}%, Rstb:%{_stable_resist}%, rate:%{_crit_rate}%, Rrate%{_crit_rate_resist}%, cdam:%{_crit_damage}%, Rcdam:%{_crit_damage_resist}%, def:%{_diffence}%, Rdef%{_diffence_resist}%"
+
+	set {_last.attack} to {_attack} * {_attack_rate} / 10000
+	if {_attack_times} > 0:
+		{_team.a} is not {_team.v}
+		projectile_hit(1, {_attacker}, event-entity)
+		loop {_attack_times} times:
+			event-entity is alive
+			attack(1, {_attacker}, event-entity, {_damage}, {_last.attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
+			make {_attacker} damage event-entity by 0
+
+	if {_heal_times} > 0:
+		{_team.a} is {_team.v}
+		projectile_hit(2, {_attacker}, event-entity)
+		loop {_heal_times} times:
+			event-entity is alive
+			heal(1, {_attacker}, event-entity, {_heal}, {_heal_rate})
+
+	if {_attack_times} is not set:
+		if {_heal_times} is not set:
+			projectile_hit(3, {_attacker}, event-entity)
+
+	if {_id} is "bond.gun":
+		{projectile.bond::%{_uuid.p}%} is not set
+		set {projectile.bond::%{_uuid.p}%} to true
+		soundloc(all players, location of event-entity, "entity.tnt.primed", 3, 1)
+		particle_long("LAVA", 1, 0.1, 0, 0, 0, event-entity, 25, 2 ticks)
+		wait 3 seconds
+		bomb(1, location of event-entity, {_attacker}, {_damage}, {_attack}*4, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+		delete {projectile.bond::%{_uuid.p}%}
+
+on projectile hit:
+	set {_uuid.p} to uuid of event-projectile
+	set {_attacker} to {projectile.shooter::%{_uuid.p}%}
+	{_attacker} is a player
+	set {_uuid.a} to uuid of {_attacker}
+	set {_id} to {projectile.id::%{_uuid.p}%}
+	set {_star} to {projectile.star::%{_uuid.p}%}
+	set {_level} to {projectile.level::%{_uuid.p}%}
+	set {_attack_times} to {projectile.attack_times::%{_uuid.p}%}
+	set {_heal_times} to {projectile.heal_times::%{_uuid.p}%}
+	set {_attack_rate} to {projectile.attack_rate::%{_uuid.p}%}
+	set {_damage} to 1
+
+	set {_attack} to ({attack::%{_uuid.a}%} + {projectile.attack::%{_uuid.p}%}) * (10000 + {attack_rise::%{_uuid.a}%} + {projectile.attack_rise::%{_uuid.p}%}) / 10000
+	set {_stable} to ({stable::%{_uuid.a}%} + {projectile.stable::%{_uuid.p}%}) * (10000 + {stable_rise::%{_uuid.a}%} + {projectile.stable_rise::%{_uuid.p}%}) / 10000
+	set {_crit_rate} to ({crit_rate::%{_uuid.a}%} + {projectile.crit_rate::%{_uuid.p}%}) * (10000 + {crit_rate_rise::%{_uuid.a}%} + {projectile.crit_rate_rise::%{_uuid.p}%}) / 10000
+	set {_crit_damage} to ({crit_damage::%{_uuid.a}%} + {projectile.crit_damage::%{_uuid.p}%}) * (10000 + {crit_damage_rise::%{_uuid.a}%} + {projectile.crit_damage_rise::%{_uuid.p}%}) / 10000
+	set {_diffence_resist} to ({diffence_resist::%{_uuid.a}%} + {projectile.diffence_resist::%{_uuid.p}%}) * (10000 + {diffence_resist_rise::%{_uuid.a}%} + {projectile.diffence_resist_rise::%{_uuid.p}%}) / 10000
+	set {_heal} to (({heal::%{_uuid.a}%} + {projectile.heal::%{_uuid.p}%}) * (10000 + {heal_rise::%{_uuid.a}%} + {projectile.heal_rise::%{_uuid.p}%}) / 10000)
+
+	if {_id} is "bond.gun":
+		{projectile.bond::%{_uuid.p}%} is not set
+		set {projectile.bond::%{_uuid.p}%} to true
+		soundloc(all players, event-location, "entity.tnt.primed", 3, 1)
+		particle_long("LAVA", 1, 0.1, 0, 0, 0, event-projectile, 25, 2 ticks)
+		wait 3 seconds
+		bomb(1, event-location, {_attacker}, {_damage}, {_attack}*4, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+		delete {projectile.bond::%{_uuid.p}%}
+
+	if {_id} is "lambic.gun":
+		damage_circle(1, event-location, 5, {_attacker}, {_damage}, {_attack}*3, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+
+	if {_id} is "rabbit.gun":
+		bomb(1, event-location, {_attacker}, {_damage}, {_attack}*5, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+
+	if {_id} is "crea.gun":
+		particle("EXPLOSION_LARGE", 1, 0, 0, 0, 0, event-location)
+		soundloc(all players, event-location, "entity.shulker_bullet.hit", 3, 1)
+		loop {projectile.crea::%{_uuid.p}%} times:
+			spawn egg at event-location
+			set {_e} to last spawned projectile
+			bullet_create({_e}, {_attacker}, "crea.gun.2", {_star}, {_level}, {_attack_times}, {_heal_times}, {_attack_rate}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_heal}, {_attack_rise}, {_stable_rise}, {_crit_rate_rise}, {_crit_damage_rise}, {_diffence_rise}, {_heal_rise})
+			bullet_kill({_e}, 5 seconds)
+			set velocity of {_e} to vector(random number between -0.2 and 0.2, random number between 0.2 and 0.4, random number between -0.2 and 0.2)
+			make {_e} glow for {_attacker}
+		delete {projectile.crea::%{_uuid.p}%}
+	if {_id} is "crea.gun.2":
+		bomb(1, event-location, {_attacker}, {_damage}, {_attack}*3, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+
+	delete {projectile.shooter::%{_uuid.p}%}
+	delete {projectile.id::%{_uuid.p}%}
+	delete {projectile.star::%{_uuid.p}%}
+	delete {projectile.level::%{_uuid.p}%}
+	delete {projectile.attack_rate::%{_uuid.p}%}
+	delete {projectile.attack_times::%{_uuid.p}%}
+	delete {projectile.heal_times::%{_uuid.p}%}
+
+	delete {projectile.attack::%{_uuid.p}%}
+	delete {projectile.stable::%{_uuid.p}%}
+	delete {projectile.crit_rate::%{_uuid.p}%}
+	delete {projectile.crit_damage::%{_uuid.p}%}
+	delete {projectile.diffence_resist::%{_uuid.p}%}
+	delete {projectile.heal::%{_uuid.p}%}
+	delete {projectile.attack_rise::%{_uuid.p}%}
+	delete {projectile.stable_rise::%{_uuid.p}%}
+	delete {projectile.crit_rate_rise::%{_uuid.p}%}
+	delete {projectile.crit_damage_rise::%{_uuid.p}%}
+	delete {projectile.diffence_resist_rise::%{_uuid.p}%}
+	delete {projectile.heal_rise::%{_uuid.p}%}
+
+	kill event-projectile
+	addshowbreak(hit block, 1)
+
+function bomb(mode: integer, loc: location, attacker: entity, damage: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number):
+	soundloc(all players, {_loc}, "entity.generic.explode", 3, 1)
+	particle("EXPLOSION_HUGE", 1, 0, 0, 0, 0, {_loc})
+	spawn 1 of armor stand at {_loc} with nbt nbt compound from "{Invisible:1b}"
+	set {_e} to last spawned entity
+	set {_random} to random integer between 0 and 99999
+	if {_attacker} is a player:
+		set {_c1} to 180
+		set {_c2} to 180
+		set {_c3} to 180
+	else:
+		set {_c1} to 180
+		set {_c2} to 0
+		set {_c3} to 0
+	drawWarpRings style 0, particle "redstone", RGB {_c1}, {_c2}, {_c3}, center {_loc}, id "%{_random}%", rainbowMode false, scan true, height 0.3, radius 4, ringCount 25, ringDensity 100, visibleRange 100
+	set {_uuid} to uuid of {_attacker}
+	loop all entities in radius 4 around {_loc}:
+		loop-entity is alive
+		loop-entity is not a player
+		all blocks between {_loc} and loop-entity is air
+		{team::%{_uuid}%} is not {team::%uuid of loop-entity%}
+		add loop-entity to {_list::*}
+	loop {_list::*}:
+		attack({_mode}, {_attacker}, loop-value, {_damage}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
+	loop {_list::*}:
+		make {_e} damage loop-value by 0
+	teleport {_e} to location(0, 0, 0)
+	kill {_e}
+	loop 4 times:
+		loop all blocks in radius loop-number around {_loc}:
+			add (random integer between 10 - loop-number and 4 - loop-number) to {_break::%location of loop-block%}
+	loop all blocks in radius 4 around {_loc}:
+		addshowbreak(loop-block, {_break::%location of loop-block%})
+	wait 2 ticks
+	stopEffect id "%{_random}%"
+
+function damage_circle(mode: integer, loc: location, range: number, attacker: entity, damage: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number):
+	soundloc(all players, {_loc}, "entity.firework.large_blast_far", 3, 1)
+	set {_random} to random integer between 0 and 99999
+	if {_attacker} is a player:
+		set {_c1} to 255
+		set {_c2} to 255
+		set {_c3} to 255
+	else:
+		set {_c1} to 255
+		set {_c2} to 0
+		set {_c3} to 0
+	drawWarpRings style 0, particle "redstone", RGB {_c1}, {_c2}, {_c3}, center {_loc}, id "%{_random}%", rainbowMode false, scan true, height 0.3, radius {_range}, ringCount 5*{_range}, ringDensity 100, visibleRange 100
+	set {_uuid} to uuid of {_attacker}
+	loop all entities in radius {_range} around {_loc}:
+		loop-entity is alive
+		loop-entity is not a player
+		all blocks between {_loc} and loop-entity is air
+		{team::%{_uuid}%} is not {team::%uuid of loop-entity%}
+		attack({_mode}, {_attacker}, loop-entity, {_damage}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
+		damage loop-entity by 0.00001
+	wait 2 ticks
+	stopEffect id "%{_random}%"
+
+function addshowbreak(block: object, n: integer):
+	set {_loc} to location of {_block}
+	if {blockbreak.stage::%{_loc}%}+{_n} < 9:
+		showbreak({_block}, floor({blockbreak.stage::%{_loc}%}+{_n}))
+	else:
+		showbreak({_block}, 9)
+
+function showbreak(block: object, n: integer):
+	set {_m} to random integer between 0 and 999999999
+	set {_loc} to location of {_block}
+	if {blockbreak.stage::%{_loc}%} is set:
+		if {blockbreak.stage::%{_loc}%} < {_n}:
+			set {blockbreak.stage::%{_loc}%} to {_n}
+			set {blockbreak.time::%{_loc}%} to now
+			stop
+		else:
+			set {blockbreak.time::%{_loc}%} to now
+			stop
+	else:
+		set {blockbreak.stage::%{_loc}%} to {_n}
+		set {blockbreak.time::%{_loc}%} to now
+		set destroy stage with id "%{_m}%" of {_block} to {blockbreak.stage::%{_loc}%} 
+
+	while {blockbreak.stage::%{_loc}%} > -2:
+		set destroy stage with id "%{_m}%" of {_block} to {blockbreak.stage::%{_loc}%}
+#		if difference between now and {blockbreak.time::%{_loc}%} > "%0.5*{blockbreak.stage::%{_loc}%}% seconds" parsed as timespan:
+		if difference between now and {blockbreak.time::%{_loc}%} > 1 seconds:
+			remove 1 from {blockbreak.stage::%{_loc}%}
+		wait "%2*({blockbreak.stage::%{_loc}%}+2)% ticks" parsed as timespan
+	delete {blockbreak.stage::%{_loc}%}
+	delete {blockbreak.time::%{_loc}%}
