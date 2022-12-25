@@ -1,0 +1,376 @@
+on right click:
+	player's tool is book
+	if player is sneaking:
+		gui(player, "armor.1")
+	else:
+		gui(player, "home")
+
+function gui(p: player, m: string):
+	set {_uuid} to uuid of {_p}
+
+	if {_m} is "home":
+		open chest with 6 row named "&8ホーム" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7"
+		set slot 49 of {_p}'s current inventory to red stained glass pane named "&7閉じる" with lore "&7> &eクリックで選択"
+		set slot 10 of {_p}'s current inventory to chest named "&fメールボックス" with lore "&7- アイテムを受け取りましょう" and "&7> &eクリックで選択"
+		set slot 12 of {_p}'s current inventory to anvil named "&f設定" with lore "&7> &eクリックで選択"
+		set slot 14 of {_p}'s current inventory to iron chestplate named "&f装備編集" with lore "&7> &eクリックで選択"
+		set slot 16 of {_p}'s current inventory to barrier named "&fニュース" with lore "&7> &eクリックで選択"
+		set slot 19 of {_p}'s current inventory to barrier named "&fステータス" with lore "&7> &eクリックで選択"
+		set slot 21 of {_p}'s current inventory to barrier named "&f合成" with lore "&7> &eクリックで選択"
+		set slot 23 of {_p}'s current inventory to barrier named "&fストレージ" with lore "&7> &eクリックで選択"
+		set slot 25 of {_p}'s current inventory to barrier named "&fショップ" with lore "&7> &eクリックで選択"
+		set slot 28 of {_p}'s current inventory to barrier named "&fREALMS SHOP" with lore "&7> &eクリックで選択"
+		set slot 30 of {_p}'s current inventory to barrier named "&fカジノ" with lore "&7> &eクリックで選択"
+		set slot 32 of {_p}'s current inventory to barrier named "&f" with lore "&7> &eクリックで選択"
+
+	if {_m} is "armor.1", "armor.2" or "armor.3":
+		if {_m} is "armor.1":
+			set {_text.1} to "&c&lマイセット[1]"
+			set {_text.3} to "&cマイセット[1]"
+			set {_item.1} to orange stained glass pane named "&7"
+			set {_item.2} to red stained glass pane named "&7"
+			set {_n} to 1
+		if {_m} is "armor.2":
+			set {_text.1} to "&b&lマイセット[2]"
+			set {_text.3} to "&bマイセット[2]"
+			set {_item.1} to light blue stained glass pane named "&7"
+			set {_item.2} to blue stained glass pane named "&7"
+			set {_n} to 2
+		if {_m} is "armor.3":
+			set {_text.1} to "&a&lマイセット[3]"
+			set {_text.3} to "&aマイセット[3]"
+			set {_item.1} to lime stained glass pane named "&7"
+			set {_item.2} to green stained glass pane named "&7"
+			set {_n} to 3
+		if name of {_p}'s current inventory is not "&8装備編集 %{_text.1}%":
+			open chest with 6 row named "&8装備編集 %{_text.1}%" to {_p}
+		set slot (integers between 0 and 53) of {_p}'s current inventory to {_item.1}
+		set slot 8 of {_p}'s current inventory to red stained glass pane named "&7"
+		set slot (17, 26, 35, 44 and 53) of {_p}'s current inventory to black stained glass pane named "&7"
+		set slot (5, 14, 23, 32, 41 and 50) of {_p}'s current inventory to {_item.2}
+		set {_text.2} to "&7なし"
+		if {armor_set::%{_uuid}%} is 1:
+			set {_text.2} to "&cマイセット[1]"
+			if {armor_set::%{_uuid}%} is {_n}:
+				set {_item.3} to orange shulker box named "%{_text.3}%" with lore "&7クリックでいずれの装備セットも" and "&7反映しないように変更します" and "" and "&f反映中&7: %{_text.2}%"
+			else:
+				set {_item.3} to orange shulker box named "%{_text.3}%" with lore "&7クリックで反映する装備セットを" and "&7%{_text.3}%&7に変更します" and "" and "&f反映中&7: %{_text.2}%"
+		if {armor_set::%{_uuid}%} is 2:
+			set {_text.2} to "&bマイセット[2]"
+			if {armor_set::%{_uuid}%} is {_n}:
+				set {_item.3} to light blue shulker box named "%{_text.3}%" with lore "&7クリックでいずれの装備セットも" and "&7反映しないように変更します" and "" and "&f反映中&7: %{_text.2}%"
+			else:
+				set {_item.3} to light blue shulker box named "%{_text.3}%" with lore "&7クリックで反映する装備セットを" and "&7%{_text.3}%&7に変更します" and "" and "&f反映中&7: %{_text.2}%"
+		if {armor_set::%{_uuid}%} is 3:
+			set {_text.2} to "&aマイセット[3]"
+			if {armor_set::%{_uuid}%} is {_n}:
+				set {_item.3} to lime shulker box named "%{_text.3}%" with lore "&7クリックでいずれの装備セットも" and "&7反映しないように変更します" and "" and "&f反映中&7: %{_text.2}%"
+			else:
+				set {_item.3} to lime shulker box named "%{_text.3}%" with lore "&7クリックで反映する装備セットを" and "&7%{_text.3}%&7に変更します" and "" and "&f反映中&7: %{_text.2}%"
+		set slot (6, 7, 15 and 16) of {_p}'s current inventory to orange stained glass pane named "&cマイセット[1]" with lore "&7クリックで編集画面を開く" and "" and "&f反映中&7: %{_text.2}%"
+		set slot (24, 25, 33 and 34) of {_p}'s current inventory to light blue stained glass pane named "&bマイセット[2]" with lore "&7クリックで編集画面を開く" and "" and "&f反映中&7: %{_text.2}%"
+		set slot (42, 43, 51 and 52) of {_p}'s current inventory to lime stained glass pane named "&aマイセット[3]" with lore "&7クリックで編集画面を開く" and "" and "&f反映中&7: %{_text.2}%"
+
+		if {helmet.%{_n}%::%{_uuid}%} is not set:
+			set slot 10 of {_p}'s current inventory to chainmail helmet named "&f装備-頭" with lore "&c装備がセットされていません" and "&7自身のインベントリから" and "&7セットしたい装備をクリックしてください"
+		else:
+			set slot 10 of {_p}'s current inventory to {helmet.%{_n}%::%{_uuid}%}
+		if {chestplate.%{_n}%::%{_uuid}%} is not set:
+			set slot 19 of {_p}'s current inventory to chainmail chestplate named "&f装備-胸" with lore "&c装備がセットされていません" and "&7自身のインベントリから" and "&7セットしたい装備をクリックしてください"
+		else:
+			set slot 19 of {_p}'s current inventory to {chestplate.%{_n}%::%{_uuid}%}
+		if {leggings.%{_n}%::%{_uuid}%} is not set:
+			set slot 28 of {_p}'s current inventory to chainmail leggings named "&f装備-脚" with lore "&c装備がセットされていません" and "&7自身のインベントリから" and "&7セットしたい装備をクリックしてください"
+		else:
+			set slot 28 of {_p}'s current inventory to {leggings.%{_n}%::%{_uuid}%}
+		if {boots.%{_n}%::%{_uuid}%} is not set:
+			set slot 37 of {_p}'s current inventory to chainmail boots named "&f装備-足" with lore "&c装備がセットされていません" and "&7自身のインベントリから" and "&7セットしたい装備をクリックしてください"
+		else:
+			set slot 37 of {_p}'s current inventory to {boots.%{_n}%::%{_uuid}%}
+		if {element.%{_n}%::%{_uuid}%} is not set:
+			set slot 21 of {_p}'s current inventory to glass bottle named "&fエレメント" with lore "&cエレメントがセットされていません" and "&7自身のインベントリから" and "&7セットしたいエレメントをクリックしてください"
+		else:
+			set slot 21 of {_p}'s current inventory to {element.%{_n}%::%{_uuid}%}
+
+		set slot 39 of {_p}'s current inventory to {_item.3}
+		if {armor_set::%{_uuid}%} is not set:
+			set slot 39 of {_p}'s current inventory to light gray shulker box named "%{_text.3}%" with lore "&7装備セットを選択していません" and "" and "&f反映中&7: %{_text.2}%"
+
+	if {_m} is "present":
+		if {present::%{_uuid}%} is not set:
+			open chest with 6 row named "&7ホーム > &8メールボックス" to {_p}
+		open {present::%{_uuid}%} to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "&7> &eクリックで選択"
+
+	if {_m} is "mix":
+		open chest with 6 row named "&7ホーム > &8合成・強化" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "&7> &eクリックで選択"
+		set slot (integers between 9 and 35) of {_p}'s current inventory to white stained glass pane named "&7"
+		set slot (5, 14, 23, 32 and 41) of {_p}'s current inventory to gray stained glass pane named "&7"
+		set slot (0, 1, 2, 3, 4, 36, 37, 38, 39 and 40) of {_p}'s current inventory to lime stained glass pane named "&f合成元アイテムスロット" with lore "&7- 下の白枠内の2つのアイテムスロットに" and "&7  合成したいアイテムを入れてください"
+		set slot (6, 7, 8, 42, 43 and 44) of {_p}'s current inventory to red stained glass pane named "&f合成済みアイテムスロット" with lore "&7- 左の白枠内の2つのアイテムを合成します" and "&7- 合成が&7&n可能な場合&7は完成予定のアイテムが" and "&7  下の白枠内のアイテムスロットに表示されます" and "&7- 表示されたアイテムを&7&nクリックして合成を実行&7します" and "&7- 合成完了後 下のアイテムスロットに完成したアイテムが出現します"
+		set slot (19 and 21) of {_p}'s current inventory to air
+		if mix(2, slot 19 of {_p}'s current inventory, slot 21 of {_p}'s current inventory) is set:
+			set slot 25 of {_p}'s current inventory to mix(2, slot 19 of {_p}'s current inventory, slot 21 of {_p}'s current inventory)
+		else:
+			set slot 25 of {_p}'s current inventory to barrier named "&c合成できません"
+
+on inventory click:
+	set {_uuid} to uuid of player
+	if name of player's current inventory is "&8ホーム":
+		if clicked slot is 49:
+			cancel event
+			sound(player, "entity.chicken.step", 0.1, 1)
+			close player's inventory
+		if clicked slot is 21:
+			cancel event
+			sound(player, "entity.chicken.step", 0.1, 1)
+			gui(player, "mix")
+		stop
+	if name of player's current inventory is "&8装備編集 &c&lマイセット[1]", "&8装備編集 &b&lマイセット[2]" or "&8装備編集 &a&lマイセット[3]":
+		if name of player's current inventory is "&8装備編集 &c&lマイセット[1]":
+			set {_n} to 1
+		if name of player's current inventory is "&8装備編集 &b&lマイセット[2]":
+			set {_n} to 2
+		if name of player's current inventory is "&8装備編集 &a&lマイセット[3]":
+			set {_n} to 3
+		if event-inventory is current inventory:
+			cancel event
+			if clicked slot is 8:
+				sound(player, "entity.chicken.step", 1, 1)
+				close player's inventory
+			if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+				sound(player, "entity.chicken.step", 1, 1)
+				gui(player, "home")
+			if clicked slot is 10:
+				equip(player, "helmet", {_n}, 0.3)
+			if clicked slot is 19:
+				equip(player, "chestplate", {_n}, 0.3)
+			if clicked slot is 28:
+				equip(player, "leggings", {_n}, 0.3)
+			if clicked slot is 37:
+				equip(player, "boots", {_n}, 0.3)
+			if clicked slot is 21:
+				equip(player, "element", {_n}, 0.3)
+			if clicked slot is 39:
+				sound(player, "entity.chicken.step", 0.3, 1)
+				if {armor_set::%{_uuid}%} is {_n}:
+					delete {armor_set::%{_uuid}%}
+				else:
+					set {armor_set::%{_uuid}%} to {_n}
+				gui(player, "armor.%{_n}%")
+			if clicked slot is 6, 7, 15 or 16:
+				sound(player, "entity.chicken.step", 0.3, 1)
+				gui(player, "armor.1")
+			if clicked slot is 24, 25, 33 or 34:
+				sound(player, "entity.chicken.step", 0.3, 1)
+				gui(player, "armor.2")
+			if clicked slot is 42, 43, 51 or 52:
+				sound(player, "entity.chicken.step", 0.3, 1)
+				gui(player, "armor.3")
+		if event-inventory is player's inventory:
+			set {_tag} to tag "type2" of nbt of clicked item
+			{_tag} is "element", "helmet", "chestplate", "leggings" or "boots"
+			{%{_tag}%.%{_n}%::%{_uuid}%} is not set
+			set {%{_tag}%.%{_n}%::%{_uuid}%} to 1 of clicked item
+			cancel event
+			remove 1 of clicked item from player's inventory
+			sound(player, "entity.chicken.step", 0.3, 1)
+			gui(player, "armor.%{_n}%")
+		stop
+	if name of player's current inventory is "&7ホーム > &8メールボックス":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "home")
+		stop
+	if name of player's current inventory is "&7ホーム > &8合成・強化":
+		if event-inventory is player's current inventory:
+			if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+				cancel event
+				sound(player, "entity.chicken.step", 1, 1)
+				gui(player, "home")
+			else if clicked slot is 25:
+				if "%tag ""fake"" of nbt of clicked item%" is "1":
+					cancel event
+					if mix(2, slot 19 of player's current inventory, slot 21 of player's current inventory) is set:
+						set slot 25 of player's current inventory to mix(1, slot 19 of player's current inventory, slot 21 of player's current inventory)
+						set slot 19 of player's current inventory to air
+						set slot 21 of player's current inventory to air
+				if name of clicked item is "&c合成できません":
+					cancel event
+			else if clicked slot is not 19 or 21:
+				cancel event
+		if slot 25 of player's current inventory is set:
+			if "%tag ""fake"" of nbt of slot 25 of player's current inventory%" is not "1":
+				if name of slot 25 of player's current inventory is not "&c合成できません":
+					if slot 25 of player's current inventory is not air:
+						stop
+		wait 1 ticks
+		if name of slot 25 of player's current inventory is "&c合成できません":
+			set {_f} to 1
+		if "%tag ""fake"" of nbt of slot 25 of player's current inventory%" is "1":
+			set {_f} to 1
+		if slot 25 of player's current inventory is air:
+			set {_f} to 1
+		{_f} is 1
+		if mix(2, slot 19 of player's current inventory, slot 21 of player's current inventory) is set:
+			set slot 25 of player's current inventory to mix(2, slot 19 of player's current inventory, slot 21 of player's current inventory)
+		else:
+			set slot 25 of player's current inventory to barrier named "&c合成できません"
+		stop
+
+on inventory close:
+	set {_uuid} to uuid of player
+	if name of player's current inventory is "&8装備編集 &c&lマイセット[1]", "&8装備編集 &b&lマイセット[2]" or "&8装備編集 &a&lマイセット[3]":
+		state(player, {armor_set::%{_uuid}%})
+		stop
+
+	if name of player's current inventory is "&7ホーム > &8メールボックス":
+		set {present::%{_uuid}%} to player's current inventory
+		stop
+
+	if name of player's current inventory is "&7ホーム > &8合成・強化":
+		loop 3 times:
+			set {_n} to 17 + loop-number * 2
+			if loop-number is 3:
+				if "%tag ""fake"" of nbt of slot 25 of player's current inventory%" is not "1":
+					if name of slot 25 of player's current inventory is not "&c合成できません":
+						set {_n} to 25
+						exit 3 sections
+				stop
+			if player's inventory has enough space for slot {_n} of player's current inventory:
+				give slot {_n} of player's current inventory to player
+			else:
+				add slot {_n} of player's current inventory to {present::%uuid of player%}
+		stop
+
+function mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemtype:
+	set {_star.1} to "%tag ""star"" of nbt of {_item.1}%" parsed as number
+	set {_star.2} to "%tag ""star"" of nbt of {_item.2}%" parsed as number
+	set {_level.1} to "%tag ""level"" of nbt of {_item.1}%" parsed as number
+	set {_level.2} to "%tag ""level"" of nbt of {_item.2}%" parsed as number
+	set {_id.1} to "%tag ""id"" of nbt of {_item.1}%"
+	set {_id.2} to "%tag ""id"" of nbt of {_item.2}%"
+	set {_type.1} to "%tag ""type"" of nbt of {_item.1}%"
+	set {_type.2} to "%tag ""type"" of nbt of {_item.2}%"
+	set {_type2.1} to "%tag ""type2"" of nbt of {_item.1}%"
+	set {_type2.2} to "%tag ""type2"" of nbt of {_item.2}%"
+	if {_type2.1} is "element":
+		if {_type2.2} is "element":
+			if {_mode} is 1:
+				return element_mix(1, {_item.1}, {_item.2})
+				stop
+			if {_mode} is 2:
+				{_star.1} is {_star.2}
+				return element_mix(2, {_item.1}, {_item.2})
+				stop
+	if {_id.1} or {_id.2} is "level.material":
+		if {_level.1} < 50:
+			evaluate "set {_return} to %{_type.1}%({_id.1}, {_star.1}, {_level.1}+1)"
+			add "{fake:1}" to nbt of {_return}
+			return {_return}
+			stop
+		if {_level.2} < 50:
+			evaluate "set {_return} to %{_type.2}%({_id.2}, {_star.2}, {_level.2}+1)"
+			add "{fake:1}" to nbt of {_return}
+			return {_return}
+			stop
+
+
+function equip(p: player, m: string, n: integer, h: number):
+	set {_uuid} to uuid of {_p}
+	if {%{_m}%.%{_n}%::%{_uuid}%} is set:
+		if {_p} has enough space for {%{_m}%.%{_n}%::%{_uuid}%}:
+			sound({_p}, "entity.chicken.step", {_h}, 1)
+			give {%{_m}%.%{_n}%::%{_uuid}%} to {_p}
+			delete {%{_m}%.%{_n}%::%{_uuid}%}
+		else:
+			send "&cインベントリに空きがありません" to {_p}
+	gui({_p}, "armor.%{_n}%")
+
+function state(p: player, n: integer):
+	set {_uuid} to uuid of {_p}
+	if {level::%{_uuid}%} is not set:
+		set {level::%{_uuid}%} to 1
+		set {exp::%{_uuid}%} to 0
+		addexp({_p}, 0)
+	set {attack::%{_uuid}%} to 0
+	set {stable::%{_uuid}%} to 0
+	set {crit_rate::%{_uuid}%} to 0
+	set {crit_damage::%{_uuid}%} to 0
+	set {diffence_resist::%{_uuid}%} to 0
+	set {heal::%{_uuid}%} to 20 * {level::%{_uuid}%}
+	set {attack_resist::%{_uuid}%} to 0
+	set {stable_resist::%{_uuid}%} to 0
+	set {crit_rate_resist::%{_uuid}%} to 0
+	set {crit_damage_resist::%{_uuid}%} to 0
+	set {diffence::%{_uuid}%} to 10 * {level::%{_uuid}%}
+	set {heal_rate::%{_uuid}%} to 10000
+	set {attack_rise::%{_uuid}%} to 0
+	set {stable_rise::%{_uuid}%} to 0
+	set {crit_rate_rise::%{_uuid}%} to 0
+	set {crit_damage_rise::%{_uuid}%} to 0
+	set {diffence_resist_rise::%{_uuid}%} to 0
+	set {heal_rise::%{_uuid}%} to 0
+	set {attack_resist_rise::%{_uuid}%} to 0
+	set {stable_resist_rise::%{_uuid}%} to 0
+	set {crit_rate_resist_rise::%{_uuid}%} to 0
+	set {crit_damage_resist_rise::%{_uuid}%} to 0
+	set {diffence_rise::%{_uuid}%} to 0
+	set {heal_rate_rise::%{_uuid}%} to 0
+	set {speed_rise::%{_uuid}%} to 0
+	set {cost_add::%{_uuid}%} to 10000
+	set {cost_add_rise::%{_uuid}%} to 0
+	loop 5 times:
+		if loop-number is 1:
+			set {_m} to "helmet"
+		if loop-number is 2:
+			set {_m} to "chestplate"
+		if loop-number is 3:
+			set {_m} to "leggings"
+		if loop-number is 4:
+			set {_m} to "boots"
+		if loop-number is 5:
+			set {_m} to "element"
+		if {%{_m}%.%{_n}%::%{_uuid}%} is set:
+			add "%tag ""attack"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {attack::%{_uuid}%}
+			add "%tag ""stable"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {stable::%{_uuid}%}
+			add "%tag ""crit_rate"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_rate::%{_uuid}%}
+			add "%tag ""crit_damage"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_damage::%{_uuid}%}
+			add "%tag ""diffence_resist"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {diffence_resist::%{_uuid}%}
+			add "%tag ""heal"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {heal::%{_uuid}%}
+			add "%tag ""attack_resist"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {attack_resist::%{_uuid}%}
+			add "%tag ""stable_resist"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {stable_resist::%{_uuid}%}
+			add "%tag ""crit_rate_resist"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_rate_resist::%{_uuid}%}
+			add "%tag ""crit_damage_resist"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_damage_resist::%{_uuid}%}
+			add "%tag ""diffence"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {diffence::%{_uuid}%}
+			add "%tag ""heal_rate"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {heal_rate::%{_uuid}%}
+			add "%tag ""attack_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {attack_rise::%{_uuid}%}
+			add "%tag ""stable_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {stable_rise::%{_uuid}%}
+			add "%tag ""crit_rate_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_rate_rise::%{_uuid}%}
+			add "%tag ""crit_damage_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_damage_rise::%{_uuid}%}
+			add "%tag ""diffence_resist_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {diffence_resist_rise::%{_uuid}%}
+			add "%tag ""heal_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {heal_rise::%{_uuid}%}
+			add "%tag ""attack_resist_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {attack_resist_rise::%{_uuid}%}
+			add "%tag ""stable_resist_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {stable_resist_rise::%{_uuid}%}
+			add "%tag ""crit_rate_resist_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_rate_resist_rise::%{_uuid}%}
+			add "%tag ""crit_damage_resist_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {crit_damage_resist_rise::%{_uuid}%}
+			add "%tag ""diffence_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {diffence_rise::%{_uuid}%}
+			add "%tag ""heal_rate_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {heal_rate_rise::%{_uuid}%}
+			add "%tag ""hp_max"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {hp_max::%{_uuid}%}
+			add "%tag ""hp_max_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {hp_max_rise::%{_uuid}%}
+			add "%tag ""speed_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {speed_rise::%{_uuid}%}
+			add "%tag ""cost_add"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {cost_add::%{_uuid}%}
+			add "%tag ""cost_add_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {cost_add_rise::%{_uuid}%}
+	set {speed_rise::%{_uuid}%} to (10000 + {speed_rise::%{_uuid}%}) / 10000
+	set {hp_max::%{_uuid}%} to (10000 + (1000 * {level::%{_uuid}%})) * ((10000 + {hp_max_rise::%{_uuid}%}) / 10000)
+
+
+
+
+
+
+
+
