@@ -1,0 +1,378 @@
+
+on join:
+	if {firstjoin::%uuid of player%} is not set:
+		set join message to ""
+		state(player, 1)
+		set {hp_now::%uuid of player%} to 11000
+		wait 10 seconds
+		set {firstjoin::%uuid of player%} to 1
+	else if {firstjoin::%uuid of player%} is 1:
+		set join message to ""
+		broadcast("&f%player% &a##join")
+		state(player, {armor_set::%uuid of player%})
+		if {save_inv::%uuid of player%} is set:
+			set player's inventory to {save_inv::%uuid of player%}
+			delete {save_inv::%uuid of player%}
+	delete {cost_stop::%uuid of player%}
+
+on quit:
+	if {firstjoin::%uuid of player%} is not 1:
+		delete {firstjoin::%uuid of player%}
+	else:
+		broadcast("&7%player% &7##quit")
+
+function tutorial(p: player, n: integer):
+	set {_uuid} to uuid of {_p}
+	if {_n} is 1:
+		set {save_inv::%{_uuid}%} to {_p}'s inventory
+		delete all items in {_p}'s inventory
+		teleport {_p} to {location::tutorial_1}
+		send title "&bNeoDivers System" with subtitle "&f戦闘チュートリアル" to {_p} for 2 seconds with fade in 1 seconds and fade out 1 seconds
+		wait 5 seconds
+		teleport {_p} to {location::tutorial_1}
+
+command /setloc [<string>]:
+	permission: skript.admin
+	trigger:
+		set {location::%arg-1%} to player's location
+
+function score(p: player):
+	wipe {_p}'s sidebar
+	set {_uuid.p} to uuid of {_p}
+	{score.off::%{_uuid.p}%} is not set
+	set {_num} to 9
+	if {score.target::%{_uuid.p}%} is not set:
+		if all blocks between location of {_p} and location of {_p}'s target is air:
+			set {_uuid} to uuid of {_p}'s target
+			if {_p}'s target is a player:
+				set name of sidebar of {_p} to "&b%{_p}'s target%"
+			else:
+				set name of sidebar of {_p} to "&c%{name::%{_uuid}%}% "
+		else:
+			set {_uuid} to uuid of {_p}
+			set name of sidebar of {_p} to "&f%{_p}%"
+	else:
+		if {score.target::%{_uuid.p}%} is alive:
+			set {_uuid} to uuid of {score.target::%{_uuid.p}%}
+			set name of sidebar of {_p} to "&f%{name::%{_uuid}%}%"
+		else:
+			set {_uuid} to uuid of {_p}
+			set name of sidebar of {_p} to "&f%{_p}%"
+			delete {score.target::%{_uuid.p}%}
+			send "&7エフェクトボード対象の消滅を確認 対象設定を自動切り替えに変更しました" to {_p}
+	loop {etc.effect.%{_uuid}%::*}:
+		set {_value::*} to loop-value split at "|"
+		set score "%{_value::5}% &7(&f%{time.effect.%{_uuid}%::%{_value::1}%}%&7)" in sidebar of {_p} to {_num}
+		remove 1 from {_num}
+		set {_have} to 1
+	loop {atk.effect.%{_uuid}%::*}:
+		set {_value::*} to loop-value split at "|"
+		set score "%{_value::5}% &7(&f%{time.effect.%{_uuid}%::%{_value::1}%}%&7)" in sidebar of {_p} to {_num}
+		remove 1 from {_num}
+		set {_have} to 1
+	loop {vic.effect.%{_uuid}%::*}:
+		set {_value::*} to loop-value split at "|"
+		set score "%{_value::5}% &7(&f%{time.effect.%{_uuid}%::%{_value::1}%}%&7)" in sidebar of {_p} to {_num}
+		remove 1 from {_num}
+		set {_have} to 1
+	if {_have} is not set:
+		if {score.target::%{_uuid.p}%} is alive:
+			set score "&7no effect" in sidebar of {_p} to {_num}
+
+command /check:
+	permission: skript.admin
+	trigger:
+		loop {atk.effect.%uuid of event-entity%::*}:
+			set {_value::*} to loop-value split at "|"
+			send "%{_value::5}%" to player
+		loop {vic.effect.%uuid of event-entity%::*}:
+			set {_value::*} to loop-value split at "|"
+			send "%{_value::5}%" to player
+
+command /variable [<text>] [<string>]:
+	permission: skript.admin
+	trigger:
+		set {_n} to arg-2 parsed as number
+		if {_n} is set:
+			set {%arg 1%::%uuid of player%} to {_n}
+		else:
+			set {%arg 1%::%uuid of player%} to arg-2
+
+on heal:
+	cancel event
+on food bar change:
+	cancel event
+on explode:
+	cancel event
+
+every 10 ticks:
+	loop all players:
+		if {cost_stop::%uuid of loop-player%} is not set:
+			add floor({cost_add::%uuid of loop-player%} * (10000 + {cost_add_rise::%uuid of loop-player%}) / 20000) to {cost::%uuid of loop-player%}
+			set {_cost} to floor({cost::%uuid of loop-player%} / 5000)
+			if {_cost} >= 1:
+				add 0.5 * {_cost} to food level of loop-player
+				remove 5000 * {_cost} from {cost::%uuid of loop-player%}
+		if food level of loop-player = 10:
+			add 1 to {cost_check::%uuid of loop-player%}
+			if {cost_check::%uuid of loop-player%} > 5:
+				set loop-player's walk speed to (0.2 * {speed_rise::%uuid of loop-player%})
+		else:
+			delete {cost_check::%uuid of loop-player%}
+		score(loop-player)
+		actionbar_hp(loop-player)
+
+function actionbar_hp(p: player):
+	set {_uuid} to uuid of {_p}
+	{actionbar::%{_uuid}%} is not set
+	if ({hp_now::%{_uuid}%} / {hp_max::%{_uuid}%}) > 0.1:
+		set {_t.1} to "&f♥&7: &a&l%comma({hp_now::%{_uuid}%})%"
+	else:
+		set {_t.1} to "&f♥&7: &c&l%comma({hp_now::%{_uuid}%})%"
+	if {shield_now::%{_uuid}%} > 0:
+		set {_t.2} to " &7+ &e&l%comma({shield_now::%{_uuid}%})%"
+	else:
+		set {_t.2} to ""
+	if {speed_rise::%{_uuid}%} is not 1:
+		if {cost_check::%{_uuid}%} < 6:
+			if {cost_check::%{_uuid}%} is 1:
+				set {_t.3} to " &8| &b■&7■■■■"
+			if {cost_check::%{_uuid}%} is 2:
+				set {_t.3} to " &8| &b■■&7■■■"
+			if {cost_check::%{_uuid}%} is 3:
+				set {_t.3} to " &8| &b■■■&7■■"
+			if {cost_check::%{_uuid}%} is 4:
+				set {_t.3} to " &8| &b■■■■&7■"
+			if {cost_check::%{_uuid}%} is 5:
+				set {_t.3} to " &8| &b■■■■■"
+		else:
+			set {_t.3} to ""
+	else:
+		set {_t.3} to ""
+	send action bar "%{_t.1}%%{_t.2}%%{_t.3}%" to {_p}
+
+function broadcast(t: string):
+	loop all players:
+		{firstjoin::%uuid of loop-player%} is 4
+		send {_t} to loop-player
+
+function actionbar(p: player, txt: string, t: number):
+	set {_uuid} to uuid of {_p}
+	add 1 to {actionbar::%{_uuid}%}
+	set {_n} to {actionbar::%{_uuid}%}
+	loop {_t} times:
+		if {actionbar::%{_uuid}%} is not {_n}:
+			stop
+		send action bar {_txt} to {_p}
+		wait 1 seconds
+	if {actionbar::%{_uuid}%} is {_n}:
+		delete {actionbar::%{_uuid}%}
+
+command /actionbar [<text>] [<integer>]:
+	permission: skript.admin
+	trigger:
+		actionbar(player, arg-1, arg-2) 
+
+command /damage [<integer>]:
+	permission: skript.admin
+	trigger:
+		damage(1, player, player, arg-1)
+
+command /heal [<integer>]:
+	permission: skript.admin
+	trigger:
+		heal(1, player, player, arg-1, 10000)
+
+command /shield [<integer>]:
+	permission: skript.admin
+	trigger:
+		shield(1, player, player, arg-1, 10000)
+
+command /nbt [<text>] [<text>]:
+	permission: skript.admin
+	trigger:
+		if arg 1 is set:
+			if arg 2 is set:
+				add "{%arg-1%:%arg-2%}" to nbt of player's tool
+			else:
+				set {_tag} to tag arg-1 of nbt of player's tool
+				send {_tag} to player
+		else:
+			send nbt of player's tool to player
+
+command /datacheck [<text>]:
+	permission: skript.admin
+	trigger:
+		broadcast "%{%arg-1%::*}%"
+
+command /datadelete:
+	permission: skript.admin
+	trigger:
+		datadelete()
+
+function datadelete(): #不在entityのデータ削除
+	set {_list::*} to "team", "id", "name", "level", "hp_max", "hp_now", "shield_now", "attack_rate", "attack_times", "heal_times", "attack", "stable", "crit_rate", "crit_damage", "diffence_resist", "heal", "attack_resist", "stable_resist", "crit_rate_resist", "crit_damage_resist", "diffence", "heal_rate", "attack_rise", "stable_rise", "crit_rate_rise", "crit_damage_rise", "diffence_resist_rise", "heal_rise", "attack_resist_rise", "stable_resist_rise", "crit_rate_resist_rise", "crit_damage_resist_rise", "diffence_rise", "heal_rate_rise", "projectile.id", "projectile.level", "projectile.star", "projectile.attack_rate", "projectile.attack_times", "projectile.heal_times", "projectile.attack", "projectile.stable", "projectile.crit_rate", "projectile.crit_damage", "projectile.diffence_resist", "projectile.heal", "projectile.attack_rise", "projectile.stable_rise", "projectile.crit_rate_rise", "projectile.crit_damage_rise", "projectile.diffence_resist_rise" and "projectile.heal_rise"
+	loop {_list::*}:
+		set {_text} to loop-value
+		loop {%{_text}%::*}:
+			loop-index-2 parsed as entity is not alive
+			loop-index-2 parsed as entity is not a player
+			delete {%{_text}%::%loop-index-2%}
+
+command /addexp [<offline player>] [<integer>]:
+	permission: skript.admin
+	trigger:
+		addexp(arg-1, arg-2)
+
+command /setlevel [<integer>]:
+	permission: skript.admin
+	trigger:
+		set {level::%uuid of player%} to arg-1
+		set {exp::%uuid of player%} to 0
+		addexp(player, 0)
+
+function addexp(p: offline player, n: integer):
+	set {_uuid} to uuid of {_p}
+	add {_n} to {exp::%{_uuid}%}
+	while {exp::%{_uuid}%} >= {level::%{_uuid}%}*100:
+		remove {level::%{_uuid}%}*100 from {exp::%{_uuid}%}
+		add 1 to {level::%{_uuid}%}
+		add 1 to {_up}
+	if {_up} > 0:
+		leveluptitle({_p}, {level::%{_uuid}%}-{_up}, {level::%{_uuid}%})
+		present({_p}, item("diamond", 0, 0), 10*{_up})
+	set level progress of {_p} to {exp::%{_uuid}%} / ({level::%{_uuid}%} * 100)
+	set level of {_p} to {level::%{_uuid}%}
+#	state({_p}, {armor_set::%{_uuid}%})
+	actionbar_hp({_p})
+
+function leveluptitle(p: player, b: number, a: number):
+	set {_uuid} to uuid of {_uuid}
+	while {leveluptitle::%{_uuid}%} is 1:
+		wait 10 ticks
+	set {leveluptitle::%{_uuid}%} to 1
+
+	if 1 is 1:
+		send "" to {_p}
+		send " &fレベルアップ！！  &7%{_b}% &8-> &a&l%{_a}%  &7(%now formatted as ""HH:mm:ss""%&7)" to {_p}
+		set {_wait} to 1 ticks
+		send title "&7LEVEL UP" with subtitle "&a%{_b}% &7>>>>>>>>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait 1 seconds
+		send title "&7LEVEL UP" with subtitle "&2%{_b}% &2>&7>>>>>>>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&7LEVEL UP" with subtitle "&7%{_b}% &a>&2>&7>>>>>>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fL&7EVEL UP" with subtitle "&7%{_b}% &2>&a>&2>&7>>>>>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLE&7VEL UP" with subtitle "&7%{_b}% &7>&2>&a>&2>&7>>>>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEV&7EL UP" with subtitle "&7%{_b}% &7>>&2>&a>&2>&7>>>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEVE&7L UP" with subtitle "&7%{_b}% &7>>>&2>&a>&2>&7>>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEVEL&7 UP" with subtitle "&7%{_b}% &7>>>>&2>&a>&2>&7>> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEVEL &7UP" with subtitle "&7%{_b}% &7>>>>>&2>&a>&2>&7> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEVEL U&7P" with subtitle "&7%{_b}% &7>>>>>>&2>&a>&2> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEVEL UP" with subtitle "&7%{_b}% &7>>>>>>>&2>&a> &7%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEVEL UP" with subtitle "&7%{_b}% &7>>>>>>>>&2> &2%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait {_wait}
+		send title "&fLEVEL UP" with subtitle "&7%{_b}% &7>>>>>>>>> &a%{_a}%" to {_p} for 2 seconds with fadein 0 ticks and fade out 3 ticks
+		wait 30 ticks
+	delete {leveluptitle::%{_uuid}%}
+
+function give(p: player, i: itemtype, n: number):
+	set {_uuid} to uuid of {_p}
+	send "" to {_p}
+	if {_p} has enough space for {_n} of {_i}:
+		give {_n} of {_i} to {_p}
+	else:
+		present({_p}, {_i}, {_n})
+
+function present(p: player, i: itemtype, n: number):
+	set {_uuid} to uuid of {_p}
+	send "" to {_p}
+	if {present::%{_uuid}%} has enough space for {_n} of {_i}:
+		add {_n} of {_i} to {present::%{_uuid}%}
+		send "%display name of {_i}% &8(&7×&f%{_n}%&8) &7が受け取り箱に送られました" to {_p}
+		stop
+	{_p} is online
+	send "&c 受け取り箱に空きがありませんでした" to {_p}
+	send "&c 1分後にもう一度 &r%display name of {_i}% &8(&7×&f%{_n}%&8) &cを送ります" to {_p}
+	wait 1 minutes
+	present({_p}, {_i}, {_n})
+
+on right click on enchantment table: #黒板制御パネル用
+	cancel event
+#	if location of event-block is location(981.5, 81.5, 1047.5):
+#		gui(player, "board")
+
+function effectclear(e: entity):
+	set {_uuid} to uuid of {_p}
+	delete {atk.effect.%{_uuid}%::*}
+	delete {vic.effect.%{_uuid}%::*}
+	delete {etc.effect.%{_uuid}%::*}
+	delete {time.effect.%{_uuid}%::*}
+
+command /alldeath:
+	permission: skript.admin
+	trigger:
+		alldeath()
+
+on skript stop:
+	alldeath()
+	datadelete()
+	loop all entities:
+		loop-entity is alive
+		effectclear(loop-entity)
+
+on quit:
+	effectclear(player)
+	delete {leveluptitle::%uuid of player%}
+
+on join:
+	if {new::%uuid of player%} is not set:
+		set {level::%uuid of player%} to 1
+		addexp(player, 0)
+		firstjoin_movie(player)
+
+function firstjoin_movie(p: player):
+	set {_uuid} to uuid of {_p}
+	wait 5 seconds
+
+
+function firstjoin(p: player):
+	set {_uuid} to uuid of {_p}
+
+
+function alldeath():
+	loop all entities:
+		loop-entity is alive
+		loop-entity is not armor stand
+		loop-entity is not a player
+		death(0, loop-entity, loop-entity)
+
+on right click:
+	player is op
+	if player's tool is clock:
+		if {count} is set:
+			delete {count}
+		else:
+			set {count} to 1
+			while 1 is 1:
+				if {count} is not set:
+					broadcast "&d&l%{count.n}% &7ticks &7(%{count.n}/60%&7 sec)"
+					delete {count.n}
+					stop
+				add 1 to {count.n}
+				send action bar "&d&l%{count.n}% &7ticks &7(%{count.n}/60%&7 sec)" to player
+				wait 1 ticks
+	if player's tool is stick:
+		send "%event-block% / %type of event-block% / %nbt of event-block%" to player
+	if player's tool is bone:
+		toggle event-block
+		event-block is black stained glass pane
+		add "{east:false,south:false,north:false,west:false}" to nbt of event-block
