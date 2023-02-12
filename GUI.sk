@@ -5,24 +5,26 @@ on right click:
 	else:
 		gui(player, "home")
 
+
 function gui(p: player, m: string):
 	set {_uuid} to uuid of {_p}
-
 	if {_m} is "home":
 		open chest with 6 row named "&8ホーム" to {_p}
 		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7"
-		set slot 49 of {_p}'s current inventory to red stained glass pane named "&7閉じる" with lore "&7> &eクリックで選択"
-		set slot 10 of {_p}'s current inventory to chest named "&fメールボックス" with lore "&7- アイテムを受け取りましょう" and "&7> &eクリックで選択"
-		set slot 12 of {_p}'s current inventory to anvil named "&f設定" with lore "&7> &eクリックで選択"
-		set slot 14 of {_p}'s current inventory to iron chestplate named "&f装備編集" with lore "&7> &eクリックで選択"
-		set slot 16 of {_p}'s current inventory to barrier named "&fニュース" with lore "&7> &eクリックで選択"
-		set slot 19 of {_p}'s current inventory to barrier named "&fステータス" with lore "&7> &eクリックで選択"
-		set slot 21 of {_p}'s current inventory to barrier named "&f合成" with lore "&7> &eクリックで選択"
-		set slot 23 of {_p}'s current inventory to barrier named "&fストレージ" with lore "&7> &eクリックで選択"
-		set slot 25 of {_p}'s current inventory to barrier named "&fショップ" with lore "&7> &eクリックで選択"
-		set slot 28 of {_p}'s current inventory to barrier named "&fREALMS SHOP" with lore "&7> &eクリックで選択"
-		set slot 30 of {_p}'s current inventory to barrier named "&fカジノ" with lore "&7> &eクリックで選択"
-		set slot 32 of {_p}'s current inventory to barrier named "&f" with lore "&7> &eクリックで選択"
+		set slot 49 of {_p}'s current inventory to red stained glass pane named "&7閉じる" with lore "" and "&7> &eクリックで選択"
+		set slot 10 of {_p}'s current inventory to chest named "&fメールボックス" with lore "&7- アイテムを受け取りましょう" and "" and "&7> &eクリックで選択"
+		set slot 12 of {_p}'s current inventory to anvil named "&f設定" with lore "" and "&7> &eクリックで選択"
+		set slot 14 of {_p}'s current inventory to iron chestplate named "&f装備編集" with lore "" and "&7> &eクリックで選択"
+		set slot 16 of {_p}'s current inventory to barrier named "&fニュース" with lore "" and "&7> &eクリックで選択"
+		set slot 19 of {_p}'s current inventory to barrier named "&fステータス" with lore "" and "&7> &eクリックで選択"
+		set slot 21 of {_p}'s current inventory to bowl named "&f合成" with lore "" and "&7> &eクリックで選択"
+		set slot 23 of {_p}'s current inventory to barrier named "&fストレージ" with lore "" and "&7> &eクリックで選択"
+		set slot 25 of {_p}'s current inventory to barrier named "&fショップ" with lore "" and "&7> &eクリックで選択"
+		set slot 28 of {_p}'s current inventory to barrier named "&fREALMS SHOP" with lore "" and "&7> &eクリックで選択"
+		set slot 30 of {_p}'s current inventory to barrier named "&fカジノ" with lore "" and "&7> &eクリックで選択"
+		set slot 32 of {_p}'s current inventory to golden ingot named "&f銀行" with lore "" and "&7> &eクリックで選択"
+		set slot 34 of {_p}'s current inventory to feather named "&f郵便" with lore "" and "&7> &eクリックで選択"
+		stop
 
 	if {_m} is "armor.1", "armor.2" or "armor.3":
 		if {_m} is "armor.1":
@@ -96,38 +98,175 @@ function gui(p: player, m: string):
 		set slot 39 of {_p}'s current inventory to {_item.3}
 		if {armor_set::%{_uuid}%} is not set:
 			set slot 39 of {_p}'s current inventory to light gray shulker box named "%{_text.3}%" with lore "&7装備セットを選択していません" and "" and "&f反映中&7: %{_text.2}%"
-
-	if {_m} is "present":
-		if {present::%{_uuid}%} is not set:
-			open chest with 6 row named "&7ホーム > &8メールボックス" to {_p}
-		open {present::%{_uuid}%} to {_p}
-		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "&7> &eクリックで選択"
+		stop
 
 	if {_m} is "mix":
-		open chest with 6 row named "&7ホーム > &8合成・強化" to {_p}
-		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "&7> &eクリックで選択"
+		open chest with 6 row named "&8合成・強化" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
 		set slot (integers between 9 and 35) of {_p}'s current inventory to white stained glass pane named "&7"
-		set slot (5, 14, 23, 32 and 41) of {_p}'s current inventory to gray stained glass pane named "&7"
-		set slot (0, 1, 2, 3, 4, 36, 37, 38, 39 and 40) of {_p}'s current inventory to lime stained glass pane named "&f合成元アイテムスロット" with lore "&7- 下の白枠内の2つのアイテムスロットに" and "&7  合成したいアイテムを入れてください"
-		set slot (6, 7, 8, 42, 43 and 44) of {_p}'s current inventory to red stained glass pane named "&f合成済みアイテムスロット" with lore "&7- 左の白枠内の2つのアイテムを合成します" and "&7- 合成が&7&n可能な場合&7は完成予定のアイテムが" and "&7  下の白枠内のアイテムスロットに表示されます" and "&7- 表示されたアイテムを&7&nクリックして合成を実行&7します" and "&7- 合成完了後 下のアイテムスロットに完成したアイテムが出現します"
+		set slot (integers between 0 and 44) of {_p}'s current inventory to gray stained glass pane named "&7"
+		set slot (integers between 9 and 13, integers between 18 and 22 and integers between 27 and 31) of {_p}'s current inventory to lime stained glass pane named "&f合成元アイテムスロット" with lore "&7- この&a緑&7枠内の2つのアイテムスロットに" and "&7  合成したいアイテムを入れてください"
+		set slot (15, 16, 17, 24, 25, 26, 33, 34 and 35) of {_p}'s current inventory to red stained glass pane named "&f合成済みアイテムスロット" with lore "&7- この&c赤&7枠内の2つのアイテムを合成します" and "&7- 合成が&7&n可能な場合&7は完成予定のアイテムが" and "&7  枠内のアイテムスロットに表示されます" and "&7- 表示されたアイテムを&7&nクリックして合成を実行&7します" and "&7- 合成完了後" and "&7  下のアイテムスロットに完成したアイテムが出現します"
 		set slot (19 and 21) of {_p}'s current inventory to air
 		if mix(2, slot 19 of {_p}'s current inventory, slot 21 of {_p}'s current inventory) is set:
 			set slot 25 of {_p}'s current inventory to mix(2, slot 19 of {_p}'s current inventory, slot 21 of {_p}'s current inventory)
 		else:
 			set slot 25 of {_p}'s current inventory to barrier named "&c合成できません"
+		stop
+
+	if {_m} is "bank":
+		if {gold::%{_uuid}%} is not set:
+			set {gold::%{_uuid}%} to 0
+		open chest with 6 row named "&8銀行" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 20 of {_p}'s current inventory to filled map with no nbt named "&f口座ステータス" with lore "&7残高: &e%{gold::%{_uuid}%}%G"
+		set slot 22 of {_p}'s current inventory to golden ingot named "&fお金を送る" with lore "&7残高: &e%{gold::%{_uuid}%}%G" and "" and "&7> &eクリックで選択"
+		set slot 24 of {_p}'s current inventory to book named "&f口座の取引履歴" with lore "&7残高: &e%{gold::%{_uuid}%}%G" and "" and "&7> &eクリックで過去の取引を確認"
+		stop
+	if {_m} is "bank_send":
+		open chest with 6 row named "&8銀行 - 送金準備" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 20 of {_p}'s current inventory to golden nugget named "&f送金額設定" with lore "&7送金額: &f%{bank_send_sum::%{_uuid}%}%G" and "&7残高: &e%{gold::%{_uuid}%}%G" and "" and "&7> &eクリックで金額を変更"
+		if {bank_send_sum::%{_uuid}%} is not set:
+			set slot 20 of {_p}'s current inventory to golden nugget named "&f送金額設定" with lore "&7送金額: &c未設定" and "&7残高: &e%{gold::%{_uuid}%}%G" and "" and "&7> &eクリックで金額を変更"
+		set slot 21 of {_p}'s current inventory to name tag named "&f送金対象設定" with lore "&7送金対象: &f%{bank_send_target::%{_uuid}%}%" and "" and "&7> &eクリックで対象を変更"
+		if {bank_send_target::%{_uuid}%} is not set:
+			set slot 21 of {_p}'s current inventory to name tag named "&f送金対象設定" with lore "&7送金対象: &c未設定" and "" and "&7> &eクリックで対象を変更"
+		set slot 24 of {_p}'s current inventory to sunflower named "&f送金内容を確定" with lore "&c未設定の項目があります"
+		if {bank_send_sum::%{_uuid}%} is set:
+			if {bank_send_target::%{_uuid}%} is set:
+				if {gold::%{_uuid}%} >= {bank_send_sum::%{_uuid}%}:
+					set slot 24 of {_p}'s current inventory to sunflower named "&f送金内容を確定" with lore "" and "&7> &eクリックで選択"
+				else:
+					set slot 24 of {_p}'s current inventory to sunflower named "&f送金内容を確定" with lore "&c残高が足りません"
+		stop
+	if {_m} is "bank_set_target":
+		open chest with 6 row named "&8銀行 - 送金準備 - 対象設定" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 0 of {_p}'s current inventory to anvil named "&fMCIDを入力して指定" with lore "" and "&7> &eクリックで選択"
+		loop all players:
+			add 1 to {_n}
+			set slot {_n} of {_p}'s current inventory to loop-value's skull named "&7MCID: &f%loop-value%" with lore "" and "&7> &eクリックして選択"
+		stop
+	if {_m} is "bank_send_confirm":
+		open chest with 6 row named "&8銀行 - 送金準備 - 送金内容確定" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 20 of {_p}'s current inventory to red wool block named "&cキャンセル" with lore "" and "&7> &eクリックで選択"
+		set slot 24 of {_p}'s current inventory to lime wool block named "&a送金する" with lore "&7送金額: &e%{bank_send_sum::%{_uuid}%}%G" and "&7送金対象: &f%{bank_send_target::%{_uuid}%}%" and "" and "&7> &e&lクリックで送金"
+		stop
+	if {_m} is "bank_send_complete":
+		open chest with 6 row named "&8送金準備 - 送金内容確定 - 送金完了" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 22 of {_p}'s current inventory to golden ingot named "&f送金が完了しました！" with lore "&7実行した内容: &f送金" and "&7金額: &e%{bank_send_sum::%{_uuid}%}%G" and "&7対象: &f%{bank_send_target::%{_uuid}%}%" and "" and "&7> &eクリックで銀行画面まで戻る"	
+		delete {bank_send_target::%{_uuid}%}
+		delete {bank_send_sum::%{_uuid}%}
+		stop
+	if {_m} is "bank_log":
+		open chest with 6 row named "&8銀行 - 取引履歴" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		loop {bank_log.%{_uuid}%::*}:
+			add 1 to {_n}
+			set {_i} to paper named "&7最新 No.&f%{_n}%"
+			set {_t::*} to loop-value split at "|"
+			loop {_t::*}:
+				add loop-value-2 to lore of {_i}
+			set slot ({_n} - 1) of {_p}'s current inventory to {_i}
+
+	if {_m} is "mail":
+		open chest with 6 row named "&8郵便" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 20 of {_p}'s current inventory to chest named "&f郵便ボックス" with lore "&7届いたアイテムを確認" and "" and "&7> クリックで選択"
+		set slot 22 of {_p}'s current inventory to chest named "&fアイテムを送る" with lore "" and "&7> &eクリックで選択"
+		set slot 24 of {_p}'s current inventory to chest named "&f郵便の取引履歴" with lore "" and "&7> &eクリックで過去の取引を確認"
+		stop
+	if {_m} is "mail_box":
+		open chest with 6 row named "&8郵便 - 郵便ボックス" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set {_n} to 0
+		loop {mail_box_icon.%{_uuid}%::*}:
+			set slot {_n} of {_p}'s current inventory to loop-value
+			add 1 to {_n}
+	if {_m} is "mail_send":
+		open chest with 6 row named "&8郵便 - 輸送準備" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 20 of {_p}'s current inventory to chest named "&f輸送内容設定" with lore "&7輸送するアイテム: &f設定済み" and "" and "&7> &eクリックで輸送内容を変更"
+		if {mail_send_inv::%{_uuid}%} is not set:
+			set slot 20 of {_p}'s current inventory to chest named "&f輸送内容設定" with lore "&7輸送するアイテム: &c未設定" and "" and "&7> &eクリックで輸送内容を変更"
+		set slot 21 of {_p}'s current inventory to chest named "&f輸送対象設定" with lore "&7輸送対象: &f%{mail_send_target::%{_uuid}%}%" and "" and "&7> &eクリックで対象を変更"
+		if {mail_send_target::%{_uuid}%} is not set:
+			set slot 21 of {_p}'s current inventory to chest named "&f輸送対象設定" with lore "&7輸送対象: &c未設定" and "" and "&7> &eクリックで対象を変更"
+		set slot 24 of {_p}'s current inventory to chest named "&f輸送内容を確定" with lore "&c未設定の項目があります"
+		if {mail_send_inv::%{_uuid}%} is set:
+			if {mail_send_target::%{_uuid}%} is set:
+				set slot 24 of {_p}'s current inventory to chest named "&f輸送内容を確定" with lore "" and "&7> &eクリックで選択"
+		stop
+	if {_m} is "mail_set_inv":
+		if {mail_send_inv::%{_uuid}%} is set:
+			open {mail_send_inv::%{_uuid}%} to {_p}
+		else:
+			open chest with 6 row named "&8郵便 - 輸送準備 - 輸送内容設定" to {_p}
+			set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		stop
+	if {_m} is "mail_set_target":
+		open chest with 6 row named "&8郵便 - 輸送準備 - 対象設定" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 0 of {_p}'s current inventory to anvil named "&fMCIDを入力して指定" with lore "" and "&7> &eクリックで選択"
+		loop all players:
+			add 1 to {_n}
+			set slot {_n} of {_p}'s current inventory to loop-value's skull named "&7MCID: &f%loop-value%" with lore "" and "&7> &eクリックして選択"
+		stop
+	if {_m} is "mail_send_confirm":
+		open chest with 6 row named "&8郵便 - 輸送準備 - 輸送内容確定" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 20 of {_p}'s current inventory to chest named "&cキャンセル" with lore "" and "&7> &eクリックで選択"
+		set slot 24 of {_p}'s current inventory to chest named "&a輸送する" with lore "&7輸送対象: &f%{mail_send_target::%{_uuid}%}%" and "" and "&7> &e&lクリックで輸送"
+		stop
+	if {_m} is "mail_send_complete":
+		open chest with 6 row named "&8輸送準備 - 輸送内容確定 - 輸送完了" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		set slot 22 of {_p}'s current inventory to chest named "&f輸送が完了しました！" with lore "&7実行した内容: &f輸送" and "&7対象: &f%{mail_send_target::%{_uuid}%}%" and "" and "&7> &eクリックで郵便画面まで戻る"
+		delete {mail_send_target::%{_uuid}%}
+		stop
+	if {_m} is "mail_log":
+		open chest with 6 row named "&8郵便 - 取引履歴" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+		loop {mail_log.%{_uuid}%::*}:
+			add 1 to {_n}
+			set {_i} to paper named "&7最新 No.&f%{_n}%"
+			set {_t::*} to loop-value split at "|"
+			loop {_t::*}:
+				add loop-value-2 to lore of {_i}
+			set slot ({_n} - 1) of {_p}'s current inventory to {_i}
+
+	if {_m} is "store":
+		open chest with 6 row named "&8" to {_p}
+		set slot (integers between 45 and 53) of {_p}'s current inventory to black stained glass pane named "&7もどる" with lore "" and "&7> &eクリックで選択"
+
 
 on inventory click:
 	set {_uuid} to uuid of player
+#ホーム
 	if name of player's current inventory is "&8ホーム":
-		if clicked slot is 49:
-			cancel event
-			sound(player, "entity.chicken.step", 0.1, 1)
-			close player's inventory
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			if clicked slot is 49:
+				cancel event
+				sound(player, "entity.chicken.step", 0.1, 1)
+				close player's inventory
 		if clicked slot is 21:
 			cancel event
 			sound(player, "entity.chicken.step", 0.1, 1)
 			gui(player, "mix")
+		if clicked slot is 32:
+			cancel event
+			sound(player, "entity.chicken.step", 0.1, 1)
+			gui(player, "bank")
+		if clicked slot is 34:
+			cancel event
+			sound(player, "entity.chicken.step", 0.1, 1)
+			gui(player, "mail")
 		stop
+#ホーム
+#装備
 	if name of player's current inventory is "&8装備編集 &c&lマイセット[1]", "&8装備編集 &b&lマイセット[2]" or "&8装備編集 &a&lマイセット[3]":
 		if name of player's current inventory is "&8装備編集 &c&lマイセット[1]":
 			set {_n} to 1
@@ -179,13 +318,9 @@ on inventory click:
 			sound(player, "entity.chicken.step", 0.3, 1)
 			gui(player, "armor.%{_n}%")
 		stop
-	if name of player's current inventory is "&7ホーム > &8メールボックス":
-		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
-			cancel event
-			sound(player, "entity.chicken.step", 1, 1)
-			gui(player, "home")
-		stop
-	if name of player's current inventory is "&7ホーム > &8合成・強化":
+#装備
+#合成
+	if name of player's current inventory is "&8合成・強化":
 		if event-inventory is player's current inventory:
 			if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
 				cancel event
@@ -194,10 +329,14 @@ on inventory click:
 			else if clicked slot is 25:
 				if "%tag ""fake"" of nbt of clicked item%" is "1":
 					cancel event
-					if mix(2, slot 19 of player's current inventory, slot 21 of player's current inventory) is set:
+					set {_fake} to mix(2, slot 19 of player's current inventory, slot 21 of player's current inventory)
+					if {_fake} is set:
 						set slot 25 of player's current inventory to mix(1, slot 19 of player's current inventory, slot 21 of player's current inventory)
-						set slot 19 of player's current inventory to air
-						set slot 21 of player's current inventory to air
+						set {_require.1} to "%tag ""require1"" of nbt of {_fake}%" parsed as number
+						set {_require.2} to "%tag ""require2"" of nbt of {_fake}%" parsed as number
+						remove {_require.1} from item amount of slot 19 of player's current inventory
+						remove {_require.1} from item amount of slot 21 of player's current inventory
+						stop
 				if name of clicked item is "&c合成できません":
 					cancel event
 			else if clicked slot is not 19 or 21:
@@ -220,18 +359,247 @@ on inventory click:
 		else:
 			set slot 25 of player's current inventory to barrier named "&c合成できません"
 		stop
+#合成
+#銀行
+	if name of player's current inventory is "&8銀行":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "home")
+		if clicked slot is 20:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank")
+		if clicked slot is 22:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank_send")
+		if clicked slot is 24:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank_log")
+		stop
+	if name of player's current inventory is "&8銀行 - 送金準備":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank")
+		if clicked slot is 20:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			open anvil gui named "bank_set_sum" with icon empty map text "金額を入力" to player
+		if clicked slot is 21:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank_set_target")
+		if clicked slot is 24:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			{bank_send_sum::%{_uuid}%} is set
+			{bank_send_target::%{_uuid}%} is set
+			{gold::%{_uuid}%} >= {bank_send_sum::%{_uuid}%}
+			gui(player, "bank_send_confirm")
+		stop
+	if name of player's current inventory is "&8銀行 - 送金準備 - 対象設定":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank_send")
+		if clicked slot is 0:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			open anvil gui named "bank_set_target" with icon paper text "MCIDを入力" to player
+		else:
+			set {_name::*} to split name of clicked item at ": &f"
+			set {_s} to {_name::2} parsed as player
+			if {_s} is set:
+				sound(player, "entity.chicken.step", 1, 1)
+				set {bank_send_target::%{_uuid}%} to {_s}
+				gui(player, "bank_send")
+		stop
+	if name of player's current inventory is "&8銀行 - 送金準備 - 送金内容確定":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank_send")
+		if clicked slot is 20:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank")
+		if clicked slot is 24:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			{bank_send_sum::%{_uuid}%} is set
+			{bank_send_target::%{_uuid}%} is set
+			{gold::%{_uuid}%} >= {bank_send_sum::%{_uuid}%}
+			sound(player, "entity.chicken.step", 1, 1) #やること: 送金完了サウンドを設定
+			send_gold(player, {bank_send_target::%{_uuid}%}, {bank_send_sum::%{_uuid}%})
+			gui(player, "bank_send_complete")
+		stop
+	if name of player's current inventory is "&8送金準備 - 送金内容確定 - 送金完了":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank_send")
+		if clicked slot is 22:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank")
+		stop
+	if name of player's current inventory is "&8銀行 - 取引履歴":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "bank")
+		if event-inventory is player's current inventory:
+			cancel event
+		stop
+#銀行
+#郵便
+	if name of player's current inventory is "&8郵便":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "home")
+		if clicked slot is 20:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_box")
+		if clicked slot is 22:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_send")
+		if clicked slot is 24:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_log")
+		stop
+	if name of player's current inventory is "&8郵便 - 郵便ボックス":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail")
+		else:
+			set {_n} to clicked slot + 1
+			if {mail_box_inv::%{_n}%} is set:
+				cancel event
+				sound(player, "entity.chicken.step", 1, 1)
+				set {_inv} to {mail_box_inv::%{_n}%}
+				set name of {_inv} to "&8郵便 - 郵便ボックス - 輸送ボックス - %{_n}%"
+				open {_inv} to player
+		stop
+	if name of player's current inventory contains "&8郵便 - 郵便ボックス - 輸送ボックス - ":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_box")
+		stop
+	if name of player's current inventory is "&8郵便 - 輸送準備":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail")
+		if clicked slot is 20:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_set_inv")
+		if clicked slot is 21:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_set_target")
+		if clicked slot is 24:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			{mail_send_inv::%{_uuid}%} is set
+			{mail_send_target::%{_uuid}%} is set
+			gui(player, "mail_send_confirm")
+		stop
+	if name of player's current inventory is "&8郵便 - 輸送準備 - 輸送内容設定":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_send")
+		stop
+	if name of player's current inventory is "&8郵便 - 輸送準備 - 対象設定":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_send")
+		if clicked slot is 0:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			open anvil gui named "mail_set_target" with icon paper text "ここに対象のMCIDを入力" to player
+		else:
+			set {_name::*} to split name of clicked item at ": &f"
+			set {_s} to {_name::2} parsed as player
+			if {_s} is set:
+				sound(player, "entity.chicken.step", 1, 1)
+				set {mail_send_target::%{_uuid}%} to {_s}
+				gui(player, "mail_send")
+		stop
+	if name of player's current inventory is "&8郵便 - 輸送準備 - 輸送内容確定":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_send")
+		if clicked slot is 20:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail")
+		if clicked slot is 24:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			{mail_send_inv::%{_uuid}%} is set
+			{mail_send_target::%{_uuid}%} is set
+			sound(player, "entity.chicken.step", 1, 1) #やること: 送金完了サウンドを設定
+			send_inv(player, {mail_send_target::%{_uuid}%}, {mail_send_inv::%{_uuid}%})
+			delete {mail_send_inv::%{_uuid}%}
+			gui(player, "mail_send_complete")
+		stop
+	if name of player's current inventory is "&8輸送準備 - 輸送内容確定 - 輸送完了":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_send")
+		if clicked slot is 22:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail")
+		stop
+	if name of player's current inventory is "&8郵便 - 取引履歴":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail")
+		else:
+			set {_n} to clicked slot + 1
+			if {mail_log_inv.%{_uuid}%::%{_n}%} is set:
+				cancel event
+				set {_inv} to {mail_log_inv.%{_uuid}%::%{_n}%}
+				set name of {_inv} to "&8郵便 - 取引履歴 - %{_n}%"
+				open {_inv} to player
+		stop
+	if name of player's current inventory contains "&8郵便 - 取引履歴 - ":
+		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
+			cancel event
+			sound(player, "entity.chicken.step", 1, 1)
+			gui(player, "mail_log")
+		else:
+			if event-inventory is player's current inventory:
+				cancel event
+		stop
+#郵便
+#
+
 
 on inventory close:
 	set {_uuid} to uuid of player
+
 	if name of player's current inventory is "&8装備編集 &c&lマイセット[1]", "&8装備編集 &b&lマイセット[2]" or "&8装備編集 &a&lマイセット[3]":
 		state(player, {armor_set::%{_uuid}%})
 		stop
 
-	if name of player's current inventory is "&7ホーム > &8メールボックス":
-		set {present::%{_uuid}%} to player's current inventory
-		stop
-
-	if name of player's current inventory is "&7ホーム > &8合成・強化":
+	if name of player's current inventory is "&8合成・強化":
 		loop 3 times:
 			set {_n} to 17 + loop-number * 2
 			if loop-number is 3:
@@ -245,10 +613,109 @@ on inventory close:
 			else:
 				add slot {_n} of player's current inventory to {present::%uuid of player%}
 		stop
+#合成
+#郵便
+	if name of player's current inventory contains "&8郵便 - 郵便ボックス - 輸送ボックス - ":
+		set {_name::*} to split name of player's current inventory at " - "
+		set {_n} to {_name::4} parsed as number
+		if slot (integers between 0 and 44) of player's current inventory is air:
+			delete {mail_box_inv.%{_uuid}%::%{_n}%}
+			fill_gap("mail_box_inv.%{_uuid}%")
+			delete {mail_box_icon.%{_uuid}%::%{_n}%}
+			fill_gap("mail_box_icon.%{_uuid}%")
+		else:
+			set {mail_box_inv.%{_uuid}%::%{_n}%} to player's current inventory
+		stop
+	if name of player's current inventory contains "&8郵便 - 輸送準備 - 輸送内容設定":
+		slot (integers between 0 and 44) of player's current inventory is not air
+		set {mail_send_inv::%{_uuid}%} to player's current inventory
+		stop
 
-function mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemtype:
+
+on anvil gui done:
+	set {_uuid} to uuid of event-player
+	if anvil gui name of event-anvilinv contains "bank_set_sum":
+		set {_sum} to event-string parsed as integer
+		if {_sum} is not set:
+			stop
+		if {_sum} < 1:
+			stop
+		set {bank_send_sum::%{_uuid}%} to {_sum}
+		wait 1 ticks
+		gui(player, "bank_send")
+		stop
+	if anvil gui name of event-anvilinv contains "bank_set_target":
+		set {_target} to event-string parsed as offline player
+		if {_target} is not set:
+			stop
+		set {bank_send_target::%{_uuid}%} to {_target}
+		wait 1 ticks
+		gui(player, "bank_send")
+		stop
+	if anvil gui name of event-anvilinv contains "mail_set_target":
+		set {_target} to event-string parsed as offline player
+		if {_target} is not set:
+			stop
+		set {mail_send_target::%{_uuid}%} to {_target}
+		wait 1 ticks
+		gui(player, "mail_send")
+		stop
+
+on anvil gui close:
+	if anvil gui name of event-anvilinv contains "bank_set_sum":
+		wait 1 ticks
+		gui(player, "bank_send")
+		stop
+	if anvil gui name of event-anvilinv contains "bank_set_target":
+		wait 1 ticks
+		gui(player, "bank_send")
+		stop
+	if anvil gui name of event-anvilinv contains "mail_set_target":
+		wait 1 ticks
+		gui(player, "mail_send")
+		stop
+
+#add_log("gold/mail_log.%{_uuid}%", "&7内容: %{_type}%|&7金額: %{_sum}%|&7支払先: %{_to}%|&7場所: %{_at}%|&7時間: &f%now formatted as ""MM/dd HH:mm:ss""%")
+function add_log(v: string, m: object):
+	if size of {%{_v}%::*} > 45:
+		delete {%{_v}%::45}
+	add "null" to {_list::*}
+	loop {%{_v}%::*}:
+		add loop-value to {_list::*}
+	set {%{_v}%::*} to {_list::*}
+	set {%{_v}%::1} to {_m}
+
+function fill_gap(v: string):
+	loop {%{_v}%::*}:
+		add loop-value to {_list::*}
+	set {%{_v}%::*} to {_list::*}
+
+function send_gold(s: player, r: offline player, n: number):
+	set {_uuid.s} to uuid of {_s}
+	set {_uuid.r} to uuid of {_r}
+	{_n} <= {gold::%{_uuid.s}%}
+	remove {_n} from {gold::%{_uuid.s}%}
+	add {_n} to {gold::%{_uuid.r}%}
+	add_log("bank_log.%{_uuid.s}%", "&7内容: &f送金しました|&7送金先: &f%{_r}%|&7金額: &c-%{_n}%&eG|&7時刻: &f%now formatted as ""MM/dd HH:mm:ss""%")
+	add_log("bank_log.%{_uuid.r}%", "&7内容: &f送金されました|&7送金元: &f%{_s}%|&7金額: &a+%{_n}%&eG|&7時刻: &f%now formatted as ""MM/dd HH:mm:ss""%")
+	send "&7銀行: &f%{_s}% &7から &e%{_n}%G &7送金されました" to {_r}
+
+function send_inv(s: player, r: offline player, inv: inventory):
+	set {_uuid.s} to uuid of {_s}
+	set {_uuid.r} to uuid of {_r}
+	add chest named "&7輸送ボックス" with lore "&7From &f%{_s}%" and "" and "&7> &eクリックで選択" to {mail_box_icon.%{_uuid.r}%::*}
+	add {_inv} to {mail_box_inv.%{_uuid.r}%::*}
+	add_log("mail_log.%{_uuid.s}%", "&7内容: &fアイテムを輸送しました|&7輸送先: &f%{_r}%|&7時刻: &f%now formatted as ""MM/dd HH:mm:ss""%")
+	add_log("mail_log_inv.%{_uuid.s}%", {_inv})
+	add_log("mail_log.%{_uuid.r}%", "&7内容: &fアイテムが輸送されました|&7輸送元: &f%{_s}%|&7時刻: &f%now formatted as ""MM/dd HH:mm:ss""%")
+	add_log("mail_log_inv.%{_uuid.r}%", {_inv})
+	send "&7郵便: &f%{_s}% &7からアイテムが郵便されましたされました" to {_r}
+
+function mix(mode: number, item.1: itemtype, item.2: itemtype) :: itemtype:
 	set {_star.1} to "%tag ""star"" of nbt of {_item.1}%" parsed as number
 	set {_star.2} to "%tag ""star"" of nbt of {_item.2}%" parsed as number
+	set {_star_max.1} to "%tag ""star_max"" of nbt of {_item.1}%" parsed as number
+	set {_star_max.2} to "%tag ""star_max"" of nbt of {_item.2}%" parsed as number
 	set {_level.1} to "%tag ""level"" of nbt of {_item.1}%" parsed as number
 	set {_level.2} to "%tag ""level"" of nbt of {_item.2}%" parsed as number
 	set {_id.1} to "%tag ""id"" of nbt of {_item.1}%"
@@ -259,27 +726,53 @@ function mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemtype:
 	set {_type2.2} to "%tag ""type2"" of nbt of {_item.2}%"
 	if {_type2.1} is "element":
 		if {_type2.2} is "element":
-			if {_mode} is 1:
-				return element_mix(1, {_item.1}, {_item.2})
+			if {_star.1} is {_star.2}:
+				if {_id.1} is {_id.2}:
+					set {_return} to element_rise({_mode}, {_item.1}, {_item.2})
+				else:
+					set {_return} to element_mix({_mode}, {_item.1}, {_item.2})
+				if {_mode} is 2:
+					add "{fake:1,require1:1,require2:1}" to nbt of {_return}
+					add "" to lore of {_return}
+					add "&7> &eクリックして合成" to lore of {_return}
+				return {_return}
 				stop
+	if {_id.1} is {_id.2}:
+		if {_star.1} < {_star_max.1}:
+			evaluate "set {_return} to %{_type.1}%({_id.1}, {_star.1}+1, {_level.1}+{_level.2})"
+		if {_return} is set:
 			if {_mode} is 2:
-				{_star.1} is {_star.2}
-				return element_mix(2, {_item.1}, {_item.2})
-				stop
+				add "{fake:1,require1:1,require2:1}" to nbt of {_return}
+				add "" to lore of {_return}
+				add "&7> &eクリックして合成" to lore of {_return}
+			return {_return}
+			stop
 	if {_id.1} or {_id.2} is "level.material":
 		if {_level.1} < 50:
 			evaluate "set {_return} to %{_type.1}%({_id.1}, {_star.1}, {_level.1}+1)"
-			add "{fake:1}" to nbt of {_return}
-			return {_return}
-			stop
 		if {_level.2} < 50:
 			evaluate "set {_return} to %{_type.2}%({_id.2}, {_star.2}, {_level.2}+1)"
-			add "{fake:1}" to nbt of {_return}
+		if {_return} is set:
+			if {_mode} is 2:
+				add "{fake:1,require1:1,require2:1}" to nbt of {_return}
+				add "" to lore of {_return}
+				add "&7> &eクリックして合成" to lore of {_return}
+			return {_return}
+			stop
+	if {_id.1} or {_id.2} is "star.material":
+		if {_star.1} < 5:
+			evaluate "set {_return} to %{_type.1}%({_id.1}, {_star.1}+1, {_level.1})"
+		if {_star.2} < 5:
+			evaluate "set {_return} to %{_type.2}%({_id.2}, {_star.2}+1, {_level.2})"
+		if {_return} is set:
+			if {_mode} is 2:
+				add "{fake:1,require1:1,require2:1}" to nbt of {_return}
+				add "" to lore of {_return}
+				add "&7> &eクリックして合成" to lore of {_return}
 			return {_return}
 			stop
 
-
-function equip(p: player, m: string, n: integer, h: number):
+function equip(p: player, m: string, n: number, h: number):
 	set {_uuid} to uuid of {_p}
 	if {%{_m}%.%{_n}%::%{_uuid}%} is set:
 		if {_p} has enough space for {%{_m}%.%{_n}%::%{_uuid}%}:
@@ -290,7 +783,7 @@ function equip(p: player, m: string, n: integer, h: number):
 			send "&cインベントリに空きがありません" to {_p}
 	gui({_p}, "armor.%{_n}%")
 
-function state(p: player, n: integer):
+function state(p: player, n: number):
 	set {_uuid} to uuid of {_p}
 	if {level::%{_uuid}%} is not set:
 		set {level::%{_uuid}%} to 1
@@ -323,6 +816,7 @@ function state(p: player, n: integer):
 	set {speed_rise::%{_uuid}%} to 0
 	set {cost_add::%{_uuid}%} to 10000
 	set {cost_add_rise::%{_uuid}%} to 0
+	set {hp_max_rise::%{_uuid}%} to 0
 	loop 5 times:
 		if loop-number is 1:
 			set {_m} to "helmet"
@@ -365,9 +859,9 @@ function state(p: player, n: integer):
 			add "%tag ""cost_add"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {cost_add::%{_uuid}%}
 			add "%tag ""cost_add_rise"" of nbt of {%{_m}%.%{_n}%::%{_uuid}%}%" parsed as number to {cost_add_rise::%{_uuid}%}
 	set {speed_rise::%{_uuid}%} to (10000 + {speed_rise::%{_uuid}%}) / 10000
-	set {hp_max::%{_uuid}%} to (10000 + (1000 * {level::%{_uuid}%})) * ((10000 + {hp_max_rise::%{_uuid}%}) / 10000)
-
-
+	set {hp_max::%{_uuid}%} to floor((10000 + (1000 * {level::%{_uuid}%})) * ((10000 + {hp_max_rise::%{_uuid}%}) / 10000))
+	if {hp_now::%{_uuid}%} > {hp_max::%{_uuid}%}:
+		set {hp_now::%{_uuid}%} to {hp_max::%{_uuid}%}
 
 
 
