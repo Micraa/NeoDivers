@@ -3,16 +3,16 @@ function sound(p: player, s: string, v: number, h: number):
 function soundloc(p: player, loc: location, s: string, v: number, h: number):
 	play sound "%{_s}%" with volume {_v} with pitch {_h} to {_p} at {_loc}
 
-function particle(id: string, num: integer, speed: number, x: number, y: number, z: number, loc: location):
+function particle(id: string, num: number, speed: number, x: number, y: number, z: number, loc: location):
 	spawn {_num} of "%{_id}%":{_speed} offset by {_x}, {_y}, {_z} at {_loc}
-function particle_long(id: string, num: integer, speed: number, x: number, y: number, z: number, e: entity, t: integer, w: timespan):
+function particle_long(id: string, num: number, speed: number, x: number, y: number, z: number, e: entity, t: number, w: timespan):
 	loop {_t} times:
 		spawn {_num} of "%{_id}%":{_speed} offset by {_x}, {_y}, {_z} at {_e}
 		wait {_w}
-function particle_for(id: string, num: integer, speed: number, x: number, y: number, z: number, loc: location, for: player):
+function particle_for(id: string, num: number, speed: number, x: number, y: number, z: number, loc: location, for: player):
 	spawn {_num} of particle "%{_id}%" for {_for} at {_loc} offset by {_x}, {_y}, {_z} with speed {_speed}
 
-function playParticle(effect: Object, n: integer, speed: number, x: number, y: number, z: number, loc: location, for: player):
+function playParticle(effect: Object, n: number, speed: number, x: number, y: number, z: number, loc: location, for: player):
 	set {_particle} to "%{_effect}% with offset by %{_x}%, %{_y}%, %{_z}% and speed %{_speed}%" parsed as a visual effect
 	show {_n} ({_particle}) at {_loc} to {_for}
 
@@ -96,9 +96,11 @@ function pumpprticle():
 	loop 280 times:
 		particle("WATER_BUBBLE", 100, 1, 3, 1, 3, location(1000.5, 99.5, 1000.5))
 		wait 1 ticks
-		push all players in radius 3 around location(1000.5, 97.5, 1000.5) random direction out of {_list::*} at speed 0.5
-	heal(0, all players, all players in radius 3 around location(1000.5, 97.5, 1000.5), 9999999999, 10000)
-	shield(0, all players, all players in radius 3 around location(1000.5, 97.5, 1000.5), random integer between 1000 and 10000, 10000)
+		set {_p::*} to all players in radius 3 around location(1000.5, 97.5, 1000.5)
+		push {_p::*} random direction out of {_list::*} at speed 0.5
+	set {_p::*} to all players in radius 3 around location(1000.5, 97.5, 1000.5)
+	heal(0, all players, {_p::*}, 9999999999, 10000)
+	shield(0, all players, {_p::*}, random integer between 1000 and 10000, 10000)
 
 function pumpsound():
 	loop 2 times:
@@ -132,27 +134,36 @@ function pump(m: string):
 			set {_set} to {_block}
 		else:
 			set {_set} to {_pane}
-		set block at location(1005, (80+loop-number), 1000) to {_set}
-		set block at location(1004, (80+loop-number), 996) to {_set}
-		set block at location(1000, (80+loop-number), 995) to {_set}
-		set block at location(996, (80+loop-number), 996) to {_set}
-		set block at location(995, (80+loop-number), 1000) to {_set}
-		set block at location(996, (80+loop-number), 1004) to {_set}
-		set block at location(1000, (80+loop-number), 1005) to {_set}
-		set block at location(1004, (80+loop-number), 1004) to {_set}
+		set {_n} to 80 + loop-number
+		set block at location(1005, {_n}, 1000) to {_set}
+		set block at location(1004, {_n}, 996) to {_set}
+		set block at location(1000, {_n}, 995) to {_set}
+		set block at location(996, {_n}, 996) to {_set}
+		set block at location(995, {_n}, 1000) to {_set}
+		set block at location(996, {_n}, 1004) to {_set}
+		set block at location(1000, {_n}, 1005) to {_set}
+		set block at location(1004, {_n}, 1004) to {_set}
 		wait 1 ticks
 
 every 1 seconds:
-	soundloc(all players, location(984, 80, 1016), "block.water.ambient", 1, random integer between 0.1 and 2)
-	soundloc(all players, location(1000, 85, 1000), "block.water.ambient", 1, random integer between 0.1 and 2)
+	set {_n.1} to random integer between 0.1 and 2
+	set {_n.2} to random integer between 0.1 and 2
+	soundloc(all players, location(984, 80, 1016), "block.water.ambient", 1, {_n.1})
+	soundloc(all players, location(1000, 85, 1000), "block.water.ambient", 1, {_n.1})
 
 every 15 seconds:
-	loop (random integer between 3 and 5) times:
+	set {_n} to random integer between 3 and 5
+	loop {_n} times:
 		fountain_circle()
-		wait "%random integer between 20 and 100% ticks" parsed as timespan
+		set {_wait} to random element out of 1 seconds, 2 seconds, 3 seconds, 4 seconds or 5 seconds
+		wait {_wait}
 
 function fountain_circle():
-	set {_loc::*} to circle(location(1000.5, 85, 1000.5), random integer between 6 and 8, random integer between 2 and 5, (random integer between 0 and 90), random element out of "x" or "z")
+	set {_n.1} to random integer between 6 and 8
+	set {_n.2} to random integer between 2 and 5
+	set {_n.3} to random integer between 0 and 90
+	set {_m.4} to random element out of "x" or "z"
+	set {_loc::*} to circle(location(1000.5, 85, 1000.5), {_n.1}, {_n.2}, {_n.3}, {_m.4})
 	loop {_loc::*}:
 		particle("end_rod", 1, 0, 0, 0, 0, loop-value)
 		wait 1 ticks
@@ -162,28 +173,30 @@ on drop:
 	event-item is diamond or emerald
 	while event-entity is alive:
 		if (block at event-entity) is water:
-			if (block at event-entity) is within location(980, 79, 1010) and location(990, 81, 1020):
+			if block at event-entity is within location(980, 79, 1010) and location(990, 81, 1020):
 				make event-entity glow for player
 				bind hologram "&7[&f×&f&l%item amount of event-item%&7]" to event-entity for 3 seconds offset by 0, 2.5, 0
 				wait 3 seconds
 				event-entity is alive
 				kill event-entity
-				particle("WATER_BUBBLE", 10, 0, 0.1, 0.1, 0.1, location 0.5 meters above event-entity)
-				particle("WATER_SPLASH", 10, 0, 0.1, 0.1, 0.1, location 0.5 meters above event-entity)
+				set {_loc.1} to location 0.5 meters above event-entity
+				set {_loc.2} to location 1 meters above event-entity
+				set {_loc.3} to location 1.5 meters above event-entity
+				particle("WATER_BUBBLE", 10, 0, 0.1, 0.1, 0.1, {_loc.1})
+				particle("WATER_SPLASH", 10, 0, 0.1, 0.1, 0.1, {_loc.1})
 				chance of 50%:
 					bind hologram "&f&lSUCCESSED!!" to event-entity for 2 seconds offset by 0, 2.5, 0
-					particle("VILLAGER_HAPPY", 10, 0.1, 0.2, 0.2, 0.2, location 1 meters above event-entity)
-					particle("NOTE", 1, 0, 0, 0, 0, location 1.5 meters above event-entity)
-					give (2 * item amount of event-item) of event-item to player
+					particle("VILLAGER_HAPPY", 10, 0.1, 0.2, 0.2, 0.2, {_loc.2})
+					particle("NOTE", 1, 0, 0, 0, 0, {_loc.3})
+					set {_n} to 2 * item amount of event-item
+					give {_n} of event-item to player
 					stop
 				bind hologram "&7&lFAILED..." to event-entity for 1 seconds offset by 0, 2.5, 0
-				particle("SPELL_INSTANT", 30, 0.1, 0.1, 0.1, 0.1, location 1 meters above event-entity)
+				particle("SPELL_INSTANT", 30, 0.1, 0.1, 0.1, 0.1, {_loc.2})
 				stop
 		wait 1 seconds
 
 #
-every 1 seconds:
-	particle("DRIP_WATER", 1, 1, 0, 0, 0, location(1018.5, 82.3, 1027.5))
 
 every 1 minutes:
 	soundloc(all players, location(1015, 82, 1027), "entity.generic.extinguish_fire", 0.4, 1.5)
