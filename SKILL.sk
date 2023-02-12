@@ -11,7 +11,7 @@ function bullet_strate(e: entity, w: timespan):
 	set gravity of {_e} to true
 	set {projectile.attack::%{_uuid}%} to {projectile.attack::%{_uuid}%} * 0.7
 
-function bullet_particle(id: string, num: integer, speed: number, x: number, y: number, z: number, e: entity):
+function bullet_particle(id: string, num: number, speed: number, x: number, y: number, z: number, e: entity):
 	while {_e} is alive:
 		particle({_id}, {_num}, {_speed}, {_x}, {_y}, {_z}, location of {_e})
 		wait 1 ticks
@@ -40,7 +40,7 @@ function bullet_kill(e: entity, w: timespan):
 	delete {projectile.heal_rise::%{_uuid}%}
 	kill {_e}
 
-function bullet_create(e: entity, shooter: entity, id: string, star: integer, level: integer, attack_times: integer, heal_times: integer, attack_rate: integer, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number, heal: number, attack_rise: number, stable_rise: number, crit_rate_rise: number, crit_damage_rise: number, diffence_rise: number, heal_rise: number):
+function bullet_create(e: entity, shooter: entity, id: string, star: number, level: number, attack_times: number, heal_times: number, attack_rate: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number, heal: number, attack_rise: number, stable_rise: number, crit_rate_rise: number, crit_damage_rise: number, diffence_rise: number, heal_rise: number):
 	set {_uuid} to uuid of {_e}
 	set {projectile.shooter::%{_uuid}%} to {_shooter}
 	set {projectile.id::%{_uuid}%} to {_id}
@@ -83,6 +83,109 @@ on left click:
 	set {_diffence_resist_rise} to "%tag ""diffence_resist_rise"" of nbt of {_tool}%" parsed as number
 	set {_heal_rise} to "%tag ""heal_rise"" of nbt of {_tool}%" parsed as number
 
+on sneak toggle:
+	set {_tool} to player's tool
+	set {_uuid} to uuid of player
+	set {_id} to "%tag ""id"" of nbt of {_tool}%"
+	set {_star} to "%tag ""star"" of nbt of {_tool}%" parsed as number
+	set {_lv} to "%tag ""level"" of nbt of {_tool}%" parsed as number
+	set {_attack_times} to "%tag ""attack_times"" of nbt of {_tool}%" parsed as number
+	set {_heal_times} to "%tag ""heal_times"" of nbt of {_tool}%" parsed as number
+	set {_attack_rate} to "%tag ""attack_rate"" of nbt of {_tool}%" parsed as number
+	set {_attack} to "%tag ""attack"" of nbt of {_tool}%" parsed as number
+	set {_stable} to "%tag ""stable"" of nbt of {_tool}%" parsed as number
+	set {_crit_rate} to "%tag ""crit_rate"" of nbt of {_tool}%" parsed as number
+	set {_crit_damage} to "%tag ""crit_damage"" of nbt of {_tool}%" parsed as number
+	set {_diffence_resist} to "%tag ""diffence_resist"" of nbt of {_tool}%" parsed as number
+	set {_heal} to "%tag ""heal"" of nbt of {_tool}%" parsed as number
+	set {_attack_rise} to "%tag ""attack_rise"" of nbt of {_tool}%" parsed as number
+	set {_stable_rise} to "%tag ""stable_rise"" of nbt of {_tool}%" parsed as number
+	set {_crit_rate_rise} to "%tag ""crit_rate_rise"" of nbt of {_tool}%" parsed as number
+	set {_crit_damage_rise} to "%tag ""crit_damage_rise"" of nbt of {_tool}%" parsed as number
+	set {_diffence_resist_rise} to "%tag ""diffence_resist_rise"" of nbt of {_tool}%" parsed as number
+	set {_heal_rise} to "%tag ""heal_rise"" of nbt of {_tool}%" parsed as number
+
+	if {_id} is "knightdrop.knuckle":
+		if {mode.%{_id}%::%{_uuid}%} is 1 or 2:
+			set {mode.%{_id}%::%{_uuid}%} to 3
+			send title "" with subtitle "&7スニークで垂直降下" to player for 1 seconds with fadein 0 ticks and fadeout 10 ticks
+			wait 1 ticks
+			while player is sneaking:
+				set velocity of player to vector(0, -2, 0)
+				particle("FIREWORKS_SPARK", 5, 0.03, 0, 0.5, 0, location 5 meter below player)
+				wait 1 ticks
+				if {mode.%{_id}%::%{_uuid}%} is not set:
+					stop
+			set velocity of player to vector(0, 0, 0)
+			set {mode.%{_id}%::%{_uuid}%} to 4
+		if {cooldown.%{_id}%::%{_uuid}%} is set:
+			if difference between now and {cooldown.%{_id}%::%{_uuid}%} < 11 seconds:
+				stop
+#		food level of player > 6
+		wait 1 ticks
+		loop 50 times:
+			set {_charge::%loop-number%} to "&7|"
+			if loop-number is 10, 20, 30 or 40:
+				set {_charge::%loop-number%} to "&c|"
+			if loop-number is 50:
+				set {_charge::%loop-number%} to "&6|"
+		loop 50 times:
+			if player is not on ground:
+				send title "" with subtitle "" to player for 1 seconds with fadein 0 ticks and fadeout 0 ticks
+				stop
+			if player is not sneaking:
+				send title "" with subtitle "" to player for 1 seconds with fadein 0 ticks and fadeout 0 ticks
+				stop
+			if "%tag ""id"" of nbt of player's tool%" is not {_id}:
+				send title "" with subtitle "" to player for 1 seconds with fadein 0 ticks and fadeout 0 ticks
+				stop
+			set {_charge::%loop-number%} to "&a|"
+			set {_t} to "%{_charge::*}%"
+			replace ", " and " and " with "" in {_t}
+			send title "" with subtitle "%{_t}%      &7" to player for 1 seconds with fadein 0 ticks and fadeout 0 ticks
+			wait 1 ticks
+		while player is sneaking:
+			if "%tag ""id"" of nbt of player's tool%" is not {_id}:
+				stop
+			if food level of player >= 6:
+				send title "" with subtitle "&7[&66&7] &eスニーク解除でジャンプ" to player for 1 seconds with fadein 0 ticks and fadeout 10 ticks
+			else:
+				send title "" with subtitle "&7[&c6&7] &eスニーク解除でジャンプ" to player for 1 seconds with fadein 0 ticks and fadeout 10 ticks
+			wait 1 ticks
+		send title "" with subtitle "&7[&66&7] &7スニーク解除でジャンプ" to player for 1 seconds with fadein 0 ticks and fadeout 10 ticks
+		set {cooldown.%{_id}%::%{_uuid}%} to now
+		set cooldown of player's tool of player to 220
+		remove 6 from food level of player
+		push player above at speed 5
+		push player forwards at speed 3
+		wait 3 ticks
+		set {mode.%{_id}%::%{_uuid}%} to 1
+		loop 200 times:
+			particle("FIREWORKS_SPARK", 1, 0, 0, 0, 0, location of player)
+			if {mode.%{_id}%::%{_uuid}%} is 1:
+				send title "" with subtitle "&eスニークで垂直降下 &8|&e 右クリックで前方に加速" to player for 1 seconds with fadein 0 ticks and fadeout 10 ticks
+			else if {mode.%{_id}%::%{_uuid}%} is 2:
+				send title "" with subtitle "&eスニークで垂直降下" to player for 1 seconds with fadein 0 ticks and fadeout 10 ticks
+			else if {mode.%{_id}%::%{_uuid}%} is 3:
+				send title "" with subtitle "&7スニークで垂直降下" to player for 1 seconds with fadein 0 ticks and fadeout 10 ticks
+			if player is on ground:
+				set velocity of player to vector(0, 0, 0)
+				set {_loc} to location of player
+				if {mode.%{_id}%::%{_uuid}%} is 3:
+					set {_attack} to {_attack} * 1.2
+				bomb(1, {_loc}, player, 1, {_attack}*5, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+				exit 2 sections
+			wait 1 ticks
+		send title "" with subtitle "" to player for 1 seconds with fadein 0 ticks and fadeout 0 ticks
+		wait 5 ticks
+		delete {mode.%{_id}%::%{_uuid}%}
+		drawWarpRings style 3, particle "redstone", RGB 120, 120, 120, center {_loc}, id "%player%_knightdrop", rainbowMode false, scan true, height 0.1, radius 15, ringCount 80, ringDensity 30, visibleRange 100
+		wait 53 ticks
+		damage_circle(1, {_loc}, 10, player, 1, {_attack}*3, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+		wait 27 ticks
+		damage_circle(1, {_loc}, 15, player, 1, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist})
+		stopEffect id "%player%_knightdrop"
+
 on right click:
 	set {_tool} to player's tool
 	set {_uuid} to uuid of player
@@ -120,6 +223,13 @@ on right click:
 				send "&7エフェクトボードの対象設定を自動切り替えに変更しました" to player
 		stop
 
+	if {_id} is "knightdrop.knuckle":
+		if {mode.%{_id}%::%{_uuid}%} is 1:
+			push player above at speed 2
+			push player forwards at speed 3
+			set {mode.%{_id}%::%{_uuid}%} to 2
+		stop
+
 	if {_id} is "light.gun":
 		if {cooldown.%{_id}%::%{_uuid}%} is not set:
 			set {cooldown.%{_id}%::%{_uuid}%} to now
@@ -144,9 +254,10 @@ on right click:
 		stop
 
 	if {_id} is "bond.gun":
-		if {cooldown.%{_id}%::%{_uuid}%} is not set:
-			set {cooldown.%{_id}%::%{_uuid}%} to now
-		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+		if {cooldown.%{_id}%::%{_uuid}%} is set:
+			if difference between now and {cooldown.%{_id}%::%{_uuid}%} <= 0 seconds: #3s
+				stop
+		set {cooldown.%{_id}%::%{_uuid}%} to now
 #		food level of player > 5
 		set {cooldown.%{_id}%::%{_uuid}%} to now
 		set cooldown of player's tool of player to 60
@@ -161,9 +272,10 @@ on right click:
 		stop
 
 	if {_id} is "lambic.gun":
-		if {cooldown.%{_id}%::%{_uuid}%} is not set:
-			set {cooldown.%{_id}%::%{_uuid}%} to now
-		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+		if {cooldown.%{_id}%::%{_uuid}%} is set:
+			if difference between now and {cooldown.%{_id}%::%{_uuid}%} <= 0 seconds: #3s
+				stop
+		set {cooldown.%{_id}%::%{_uuid}%} to now
 #		food level of player > 5
 		set {cooldown.%{_id}%::%{_uuid}%} to now
 		set cooldown of player's tool of player to 60
@@ -178,9 +290,10 @@ on right click:
 		stop
 
 	if {_id} is "rabbit.gun":
-		if {cooldown.%{_id}%::%{_uuid}%} is not set:
-			set {cooldown.%{_id}%::%{_uuid}%} to now
-		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+		if {cooldown.%{_id}%::%{_uuid}%} is set:
+			if difference between now and {cooldown.%{_id}%::%{_uuid}%} <= 0 seconds: #3s
+				stop
+		set {cooldown.%{_id}%::%{_uuid}%} to now
 #		food level of player > 5
 		set {cooldown.%{_id}%::%{_uuid}%} to now
 		set cooldown of player's tool of player to 60
@@ -195,9 +308,10 @@ on right click:
 		stop
 
 	if {_id} is "rapidrate.gun":
-		if {cooldown.%{_id}%::%{_uuid}%} is not set:
-			set {cooldown.%{_id}%::%{_uuid}%} to now
-		difference between now and {cooldown.%{_id}%::%{_uuid}%} > 0 seconds #3s
+		if {cooldown.%{_id}%::%{_uuid}%} is set:
+			if difference between now and {cooldown.%{_id}%::%{_uuid}%} <= 0 seconds: #3s
+				stop
+		set {cooldown.%{_id}%::%{_uuid}%} to now
 #		food level of player > 5
 		set {cooldown.%{_id}%::%{_uuid}%} to now
 		set cooldown of player's tool of player to 60
@@ -298,7 +412,7 @@ function cost(p: player, c: number):
 	{_n} is {cost_stop::%{_uuid}%}
 	delete {cost_stop::%{_uuid}%}
 
-function span(span: timespan) :: integer:
+function span(span: timespan) :: number:
 	if 0.1 seconds < {_span}:
 		if {_span} < 0.3 seconds:
 			return 1
