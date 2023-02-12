@@ -1,25 +1,25 @@
-command /weapon [<integer>]:
+command /weapon [<number>]:
 	permission: skript.admin
 	trigger:
 		open chest with 6 row named "&8WEAPON-LIST" to player
 		loop 54 times:
 			set slot (loop-number - 2) of player's current inventory to weapon({item.weapon::%loop-number + (54 * arg-1)%}, 1, 1)
 
-command /armor [<integer>]:
+command /armor [<number>]:
 	permission: skript.admin
 	trigger:
 		open chest with 6 row named "&8AORMOR-LIST" to player
 		loop 54 times:
 			set slot (loop-number - 2) of player's current inventory to armor({item.armor::%loop-number + (54 * arg-1)%}, 1, 1)
 
-command /item [<integer>]:
+command /item [<number>]:
 	permission: skript.admin
 	trigger:
 		open chest with 6 row named "&8ITEM-LIST" to player
 		loop 54 times:
 			set slot (loop-number - 2) of player's current inventory to item({item.item::%loop-number + (54 * arg-1)%}, 1, 1)
 
-command /star [<integer>] [<integer>]:
+command /star [<number>] [<number>]:
 	permission: skript.admin
 	trigger:
 		set {_id} to "%tag ""id"" of nbt of player's tool%"
@@ -35,11 +35,11 @@ command /star [<integer>] [<integer>]:
 			set player's tool to armor({_id}, arg-1, arg-2)
 
 on load:
-	set {item.weapon::*} to "nuro.gun", "rapidrate.gun", "crea.gun", "rabbit.gun", "lambic.gun", "bond.gun", "light.gun", "holocide.sword" and "newcircle.sword"
+	set {item.weapon::*} to "knightdrop.knuckle", "recoverybase.tarret", "nuro.gun", "rapidrate.gun", "crea.gun", "rabbit.gun", "lambic.gun", "bond.gun", "light.gun", "holocide.sword" and "newcircle.sword"
 	set {item.armor::*} to "keep", "moon.helmet", "moon.chestplate", "moon.leggings" and "moon.boots"
 	set {item.item::*} to "star.material", "level.material", "eb.tool", "gold" and "crystal"
 
-function item(id: string, star: integer, lv: number) :: itemtype:
+function item(id: string, star: number, lv: number) :: itemtype:
 	if {_star} is 0:
 		set {_star.text} to "&f⚝ &7(&f&l1&7)"
 	if {_star} is 1:
@@ -54,30 +54,27 @@ function item(id: string, star: integer, lv: number) :: itemtype:
 		set {_star.text} to "&f⚝⚝⚝⚝⚝ &7(&f&l5&7)"
 
 	if {_id} is "eb.tool":
-		set {_give} to name tag named "&fエフェクトボードツール" with lore "&7アイテム-道具 &8| %{_star.text}%" and "" and "&7[0] 左クリック（攻撃）" and "&7- エフェクトボードの設定対象を攻撃した対象に変更" and "&7[0] 右クリック" and "&7- エフェクトボードの設定対象を自動切り替えに変更" and "&7[0] スニーク+右クリック" and "&7- エフェクトボード機能を停止" and "&7[0] エフェクトボード停止中+右クリック" and "&7- エフェクトボードを起動"
+		set {_give} to name tag named "&fエフェクトボードツール" with lore "&7アイテム-道具 &8| &f⚝ &7(&f&l1&7)" and "" and "&7[0] 左クリック（攻撃）" and "&7- エフェクトボードの設定対象を攻撃した対象に変更" and "&7[0] 右クリック" and "&7- エフェクトボードの設定対象を自動切り替えに変更" and "&7[0] スニーク+右クリック" and "&7- エフェクトボード機能を停止" and "&7[0] エフェクトボード停止中+右クリック" and "&7- エフェクトボードを起動"
 		add "{id:%{_id}%,type:item,type2:tool,Unbreakable:1,HideFlags:63}" to nbt of {_give}
 
-	if {_id} is "crystal":
-		set {_give} to diamond named "&b情報結晶" with lore "&7アイテム-財貨 &8| %{_star.text}%" and "" and "&7- 非常に価値の高い通貨"
-		add "{id:%{_id}%,type:item,type2:money,Unbreakable:1,HideFlags:63}" to nbt of {_give}
-	if {_id} is "gold":
-		set {_give} to gold ingot named "&eゴールド &8[&7×&f&l%{_lv}%&8]" with lore "&7アイテム-財貨 &8| %{_star.text}%" and "" and "&7- 基本的な通貨"
-		add "{id:%{_id}%,type:item,type2:money,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+	if {_id} is "hoke.tool":
+		set {_give} to name tag named "&fホーク" with lore "&7アイテム-道具 &8| &f⚝ &7(&f&l1&7)" and "" and "&7[&63&7] 右クリック" and "&7- 周囲の敵を発光させる"
+		add "{id:%{_id}%,type:item,type2:tool,Unbreakable:1,HideFlags:63}" to nbt of {_give}
 
 	if {_id} is "level.material":
-		set {_give} to iron ingot named "&bレベル素材" with lore "&7アイテム-素材 &8| %{_star.text}%" and "" and "&7- 合成したアイテムのレベルを上昇させる"
+		set {_give} to iron ingot named "&bレベル素材" with lore "&7アイテム-素材 &8| &f⚝ &7(&f&l1&7)" and "" and "&7- 合成したアイテムのレベルを上昇させる"
 		add "{id:%{_id}%,type:item,type2:material,Unbreakable:1,HideFlags:63}" to nbt of {_give}
 	if {_id} is "star.material":
-		set {_give} to iron ingot of unbreaking 1 with hidden enchantments named "&f星⚝素材" with lore "&7アイテム-素材 &8| %{_star.text}%" and "" and "&7- 合成したアイテムの星⚝を上昇させる"
+		set {_give} to iron ingot of unbreaking 1 with hidden enchantments named "&f星⚝素材" with lore "&7アイテム-素材 &8| &f⚝ &7(&f&l1&7)" and "" and "&7- 合成したアイテムの星⚝を上昇させる"
 		add "{id:%{_id}%,type:item,type2:material,Unbreakable:1,HideFlags:63}" to nbt of {_give}
 
 	if {_id} is "bone.loot":
-		set {_give} to iron ingot of unbreaking 1 with hidden enchantments named "&f" with lore "&7アイテム-戦利品 &8| %{_star.text}%" and "" and "&7- アイテムの⚝を&f1&7増加させるのに使用できる"
+		set {_give} to bone of unbreaking 1 with hidden enchantments named "&f骨" with lore "&7アイテム-戦利品 &8| %{_star.text}%" and "" and "&7- アイテムの⚝を&f1&7増加させるのに使用できる"
 		add "{id:%{_id}%,type:item,type2:loot,Unbreakable:1,HideFlags:63}" to nbt of {_give}
 
 	return {_give}
 
-function weapon(id: string, star: integer, lv: number) :: itemtype:
+function weapon(id: string, star: number, lv: number) :: itemtype:
 	if {_star} is 0:
 		set {_star.text} to "&f⚝ &7(&f&l1&7)"
 	if {_star} is 1:
@@ -107,6 +104,23 @@ function weapon(id: string, star: integer, lv: number) :: itemtype:
 		set {_crit_damage} to 15000 #1000*0.8(1+0.2*1)
 		set {_give} to iron sword named "&fホロサイド &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-剣 &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&61&7] 左クリック（攻撃）" and "&7- 攻撃した対象に攻撃力&c100%%&7分のダメージ"
 		add "{id:%{_id}%,type:weapon,type2:sword,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63,AttributeModifiers:[{AttributeName:""generic.attackDamage"",Name:""generic.attackDamage"",Amount:1,Operation:0,UUIDLeast:35265,UUIDMost:630536}]}" to nbt of {_give}
+
+	#knuckle
+
+	if {_id} is "knightdrop.knuckle":
+		set {_attack} to floor(1000 + (0.1 * 100 * {_lv} * {_star}) + (100 * {_lv}))
+		set {_stable} to 9500
+		set {_crit_rate} to 5000
+		set {_crit_damage} to 15000 #1000*0.8(1+0.2*1)
+		set {_give} to feather named "&fナイトドロップ &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-ナックルダスター &8| %{_star.text}%" and "&7攻撃力: &c%{_attack}%" and "" and "&7[&60.5~&7] シフト長押し（スニーク維持）" and "&7- スニーク解除までコストをチャージ" and "&7- スニーク解除時に&fチャージコスト&7量に応じてジャンプ" and "&7- 滞空中に地面に向かって&f&l右クリック&7で着地点を決定" and "&7- 着地点に向かって加速 一定時間内に着地で" and "&7  着地点を中心としたの球形範囲内の対象に" and "&7  攻撃力の&c300%%&7分のダメージ" and "&7- さらにより広範囲の敵に&c200%%&7分のダメージ"
+		add "{id:%{_id}%,type:weapon,type2:knuckle,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63,AttributeModifiers:[{AttributeName:""generic.attackDamage"",Name:""generic.attackDamage"",Amount:1,Operation:0,UUIDLeast:35265,UUIDMost:630536}]}" to nbt of {_give}
+
+	#turret
+
+	if {_id} is "recoverybase.turret":
+		set {_heal} to floor(1000 + (0.1 * 100 * {_lv} * {_star}) + (100 * {_lv}))
+		set {_give} to iron block named "&fリカバリーベース &8[&7Lv.&f&l%{_lv}%&8]" with lore "&7武器-タレット &8| %{_star.text}%" and "&7回復力: &a%{_attack}%" and "" and "&7[&68&7] シフト長押し（スニーク維持）（&f3秒&7維持）" and "&7- 使用者の位置に回復タレットを設置" and "&7- タレットを中心としたの球形範囲内の対象に" and "&7治癒力の&a100%%&7分の回復" and "&7- 回復は&f1秒&7に&f1回&7 &f10秒&7でタレットは消滅"
+		add "{id:%{_id}%,type:weapon,type2:turret,star:%{_star}%,level:%{_lv}%,attack_rate:10000,attack_times:1,attack:%{_attack}%,stable:%{_stable}%,crit_rate:%{_crit_rate}%,crit_damage:%{_crit_damage}%,Unbreakable:1,HideFlags:63,AttributeModifiers:[{AttributeName:""generic.attackDamage"",Name:""generic.attackDamage"",Amount:1,Operation:0,UUIDLeast:35265,UUIDMost:630536}]}" to nbt of {_give}
 
 	#gun
 
@@ -162,7 +176,7 @@ function weapon(id: string, star: integer, lv: number) :: itemtype:
 
 	return {_give}
 
-function armor(id: string, star: integer, lv: number) :: itemtype:
+function armor(id: string, star: number, lv: number) :: itemtype:
 	if {_star} is 0:
 		set {_star.text} to "&f⚝ &7(&f&l1&7)"
 	if {_star} is 1:
