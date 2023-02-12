@@ -1,4 +1,4 @@
-command /element [<integer>]:
+command /element [<number>]:
 	permission: skript.admin
 	trigger:
 		if arg-1 is not set:
@@ -19,45 +19,8 @@ command /element [<integer>]:
 		set slot 10 of player's current inventory to element_new("crit_damage_resist", {_n})
 		set slot 11 of player's current inventory to element_new("diffence", {_n})
 		set slot 12 of player's current inventory to element_new("heal_rate", {_n})
-
-command /elementrise:
-	permission: skript.admin
-	trigger:
-		set {_type} to "%tag ""type"" of nbt of player's tool%"
-		set {_id} to "%tag ""id"" of nbt of player's tool%"
-		set {_give} to element_rise(player's tool)
-		set slot player's current hotbar slot of player's inventory to {_give}
-		send "&6* &7実行済み" to player
-
-command /elementmix:
-	permission: skript.admin
-	trigger:
-		open chest with 6 row named "&8ELEMENT-MIX for developer" to player
-		set slot (integers between 45 and 53) of player's current inventory to black stained glass pane named "&7合成" with lore "&7> &eクリックで合成"
-
-on inventory click:
-	if name of player's current inventory is "&8ELEMENT-MIX for developer":
-		if clicked slot is 45, 46, 47, 48, 49, 50, 51, 52 or 53:
-			cancel event
-			sound(player, "entity.chicken.step", 1, 1)
-			loop all items in player's current inventory:
-				"%tag ""type2"" of nbt of loop-item%" is "element"
-				loop item amount of loop-item times:
-					add loop-item to {_list::*}
-					remove loop-item from player's current inventory
-			while size of {_list::*} > 1:
-				loop {_list::*}:
-					add 1 to {_n}
-					if {_n} is 1:
-						set {_item} to loop-value
-					else:
-						add element_mix(1, loop-value, {_item}) to {_list2::*}
-						remove loop-value and {_item} from {_list::*}
-						remove 2 from {_n}
-					wait 1 ticks
-				set {_list::*} to {_list2::*}
-			loop {_list::*}:
-				set slot 0 of player's current inventory to loop-value
+		set slot 13 of player's current inventory to element_new("cost_add", {_n})
+		set slot 14 of player's current inventory to element_new("hp_max", {_n})
 
 options:
 	attack_rise_max: 5000
@@ -76,7 +39,7 @@ options:
 	cost_add_rise_max: 2000
 	hp_max_rise_max: 5000
 
-function element_new(id: string, star: integer) :: itemtype:
+function element_new(id: string, star: number) :: itemtype:
 	if {_star} is 1:
 		set {_star.text} to "&f⚝&8⚝⚝⚝⚝ &7(&f1&7)"
 	if {_star} is 2:
@@ -165,8 +128,13 @@ function element_new(id: string, star: integer) :: itemtype:
 
 	return {_give}
 
-function element_rise(item: itemtype) :: itemtype:
-	set {_star} to "%tag ""star"" of nbt of {_item}%" parsed as number
+function element_rise(mode: number, item.1: itemtype, item.2: itemtype) :: itemtype:
+	"%tag ""star"" of nbt of {_item.1}%" parsed as number is "%tag ""star"" of nbt of {_item.2}%" parsed as number
+	"%tag ""id"" of nbt of {_item.1}%" is "%tag ""id"" of nbt of {_item.2}%"
+	set {_star} to "%tag ""star"" of nbt of {_item.1}%" parsed as number
+	set {_id} to "%tag ""id"" of nbt of {_item.1}%" parsed as number
+
+
 
 	if {_star} < 5:
 		add 1 to {_star}
@@ -183,98 +151,188 @@ function element_rise(item: itemtype) :: itemtype:
 		set {_star.text} to "&f⚝⚝⚝⚝⚝ &7(&f&l5&7)"
 
 	if {_id} is "attack":
-		set {_value_old} to "%tag ""attack_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""attack_rise"" of nbt of {_item.1}%" parsed as number > "%tag ""attack_rise"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""attack_rise"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""attack_rise"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@attack_rise_max}
-		set {_give} to potion named "&c攻撃力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@attack_rise_max})%" and "" and "&c攻撃力 &c+%{_value} / 100%%%"
-		add "{CustomPotionColor:16733525,id:attack,type:armor,type2:element,attack_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&c攻撃力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@attack_rise_max})%" and "" and "&c攻撃力 &c+%{_value} / 100%%%"
+			add "{CustomPotionColor:16733525,id:attack,type:armor,type2:element,attack_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&c攻撃力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@attack_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&c攻撃力 &c+%{_value_old} / 100%%% &f~ &c%{_star} / 5 * {@attack_rise_max} / 100%%%"
 
 	if {_id} is "stable":
-		set {_value_old} to "%tag ""stable_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""stable"" of nbt of {_item.1}%" parsed as number > "%tag ""stable"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""stable"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""stable"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@stable_rise_max}
-		set {_give} to potion named "&3安定力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@stable_rise_max})%" and "" and "&3安定力 &3+%{_value} / 100%%%"
-		add "{CustomPotionColor:43690,id:stable,type:armor,type2:element,stable_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&3安定力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@stable_rise_max})%" and "" and "&3安定力 &3+%{_value} / 100%%%"
+			add "{CustomPotionColor:43690,id:stable,type:armor,type2:element,stable_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&3安定力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@stable_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&3安定力 &3+%{_value_old} / 100%%% &f~ &3%{_star} / 5 * {@stable_rise_max} / 100%%%"
 
 	if {_id} is "crit_rate":
-		set {_value_old} to "%tag ""crit_rate_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""crit_rate"" of nbt of {_item.1}%" parsed as number > "%tag ""crit_rate"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""crit_rate"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""crit_rate"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@crit_rate_rise_max}
-		set {_give} to potion named "&e会心率&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_rate_rise_max})%" and "" and "&e会心率 &e+%{_value} / 100%%%"
-		add "{CustomPotionColor:16777045,id:crit_rate,type:armor,type2:element,crit_rate_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&e会心率&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_rate_rise_max})%" and "" and "&e会心率 &e+%{_value} / 100%%%"
+			add "{CustomPotionColor:16777045,id:crit_rate,type:armor,type2:element,crit_rate_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&e会心率&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@crit_rate_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&e会心率 &e+%{_value_old} / 100%%% &f~ &e%{_star} / 5 * {@crit_rate_rise_max} / 100%%%"
 
 	if {_id} is "crit_damage":
-		set {_value_old} to "%tag ""crit_damage_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""crit_damage"" of nbt of {_item.1}%" parsed as number > "%tag ""crit_damage"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""crit_damage"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""crit_damage"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@crit_damage_rise_max}
-		set {_give} to potion named "&d会心ダメージ率&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_damage_rise_max})%" and "" and "&d会心ダメージ率 &d+%{_value} / 100%%%"
-		add "{CustomPotionColor:16733695,id:crit_damage,type:armor,type2:element,crit_damage_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&d会心ダメージ率&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_damage_rise_max})%" and "" and "&d会心ダメージ率 &d+%{_value} / 100%%%"
+			add "{CustomPotionColor:16733695,id:crit_damage,type:armor,type2:element,crit_damage_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&d会心ダメージ率&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@crit_damage_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&d会心ダメージ率 &d+%{_value_old} / 100%%% &f~ &d%{_star} / 5 * {@crit_damage_rise_max} / 100%%%"
 
 	if {_id} is "diffence_resist":
-		set {_value_old} to "%tag ""diffence_resist_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""diffence_resist"" of nbt of {_item.1}%" parsed as number > "%tag ""diffence_resist"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""diffence_resist"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""diffence_resist"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@diffence_resist_rise_max}
-		set {_give} to potion named "&9防御抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@diffence_resist_rise_max})%" and "" and "&9防御抵抗力 &9+%{_value} / 100%%%"
-		add "{CustomPotionColor:5592575,id:diffence_resist,type:armor,type2:element,diffence_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&9防御抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@diffence_resist_rise_max})%" and "" and "&9防御抵抗力 &9+%{_value} / 100%%%"
+			add "{CustomPotionColor:5592575,id:diffence_resist,type:armor,type2:element,diffence_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&9防御抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@diffence_resist_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&9防御抵抗力 &9+%{_value_old} / 100%%% &f~ &9%{_star} / 5 * {@diffence_resist_rise_max} / 100%%%"
 
 	if {_id} is "heal":
-		set {_value_old} to "%tag ""heal_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""heal"" of nbt of {_item.1}%" parsed as number > "%tag ""heal"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""heal"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""heal"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@heal_rise_max}
-		set {_give} to potion named "&a回復力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@heal_rise_max})%" and "" and "&a回復力 &a+%{_value} / 100%%%"
-		add "{CustomPotionColor:5635925,id:heal,type:armor,type2:element,heal_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&a回復力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@heal_rise_max})%" and "" and "&a回復力 &a+%{_value} / 100%%%"
+			add "{CustomPotionColor:5635925,id:heal,type:armor,type2:element,heal_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&a回復力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@heal_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&a回復力 &a+%{_value_old} / 100%%% &f~ &a%{_star} / 5 * {@heal_rise_max} / 100%%%"
 
 	if {_id} is "attack_resist":
-		set {_value_old} to "%tag ""attack_resist_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""attack_resist"" of nbt of {_item.1}%" parsed as number > "%tag ""attack_resist"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""attack_resist"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""attack_resist"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@attack_resist_rise_max}
-		set {_give} to potion named "&c攻撃抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@attack_resist_rise_max})%" and "" and "&c攻撃抵抗力 &c+%{_value} / 100%%%"
-		add "{CustomPotionColor:16733525,id:attack_resist,type:armor,type2:element,attack_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&c攻撃抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@attack_resist_rise_max})%" and "" and "&c攻撃抵抗力 &c+%{_value} / 100%%%"
+			add "{CustomPotionColor:16733525,id:attack_resist,type:armor,type2:element,attack_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&c攻撃抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@attack_resist_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&c攻撃抵抗力 &c+%{_value_old} / 100%%% &f~ &c%{_star} / 5 * {@attack_resist_rise_max} / 100%%%"
 
 	if {_id} is "stable_resist":
-		set {_value_old} to "%tag ""stable_resist_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""stable_resist"" of nbt of {_item.1}%" parsed as number > "%tag ""stable_resist"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""stable_resist"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""stable_resist"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@stable_resist_rise_max}
-		set {_give} to potion named "&3安定抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@stable_resist_rise_max})%" and "" and "&3安定抵抗力 &3+%{_value} / 100%%%"
-		add "{CustomPotionColor:43690,id:stable_resist,type:armor,type2:element,stable_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&3安定抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@stable_resist_rise_max})%" and "" and "&3安定抵抗力 &3+%{_value} / 100%%%"
+			add "{CustomPotionColor:43690,id:stable_resist,type:armor,type2:element,stable_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&3安定抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@stable_resist_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&3安定抵抗力 &3+%{_value_old} / 100%%% &f~ &3%{_star} / 5 * {@stable_resist_rise_max} / 100%%%"
 
 	if {_id} is "crit_rate_resist":
-		set {_value_old} to "%tag ""crit_rate_resist_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""crit_rate_resist"" of nbt of {_item.1}%" parsed as number > "%tag ""crit_rate_resist"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""crit_rate_resist"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""crit_rate_resist"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@crit_rate_resist_rise_max}
-		set {_give} to potion named "&e会心抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_rate_resist_rise_max})%" and "" and "&e会心抵抗力 &e+%{_value} / 100%%%"
-		add "{CustomPotionColor:16777045,id:crit_rate_resist,type:armor,type2:element,crit_rate_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&e会心抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_rate_resist_rise_max})%" and "" and "&e会心抵抗力 &e+%{_value} / 100%%%"
+			add "{CustomPotionColor:16777045,id:crit_rate_resist,type:armor,type2:element,crit_rate_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&e会心抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@crit_rate_resist_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&e会心抵抗力 &e+%{_value_old} / 100%%% &f~ &e%{_star} / 5 * {@crit_rate_resist_rise_max} / 100%%%"
 
 	if {_id} is "crit_damage_resist":
-		set {_value_old} to "%tag ""crit_damage_resist_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""crit_damage_resist"" of nbt of {_item.1}%" parsed as number > "%tag ""crit_damage_resist"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""crit_damage_resist"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""crit_damage_resist"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@crit_damage_resist_rise_max}
-		set {_give} to potion named "&d会心ダメージ抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_damage_resist_rise_max})%" and "" and "&d会心ダメージ抵抗力 &d+%{_value} / 100%%%"
-		add "{CustomPotionColor:16733695,id:crit_damage_resist,type:armor,type2:element,crit_damage_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&d会心ダメージ抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@crit_damage_resist_rise_max})%" and "" and "&d会心ダメージ抵抗力 &d+%{_value} / 100%%%"
+			add "{CustomPotionColor:16733695,id:crit_damage_resist,type:armor,type2:element,crit_damage_resist_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&d会心ダメージ抵抗力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@crit_damage_resist_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&d会心ダメージ抵抗力 &d+%{_value_old} / 100%%% &f~ &d%{_star} / 5 * {@crit_damage_resist_rise_max} / 100%%%"
 
 	if {_id} is "diffence":
-		set {_value_old} to "%tag ""diffence_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""diffence"" of nbt of {_item.1}%" parsed as number > "%tag ""diffence"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""diffence"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""diffence"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@diffence_rise_max}
-		set {_give} to potion named "&9防御力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@diffence_rise_max})%" and "" and "&9防御力 &9+%{_value} / 100%%%"
-		add "{CustomPotionColor:5592575,id:diffence,type:armor,type2:element,diffence_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&9防御力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@diffence_rise_max})%" and "" and "&9防御力 &9+%{_value} / 100%%%"
+			add "{CustomPotionColor:5592575,id:diffence,type:armor,type2:element,diffence_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&9防御力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@diffence_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&9防御力 &9+%{_value_old} / 100%%% &f~ &9%{_star} / 5 * {@diffence_rise_max} / 100%%%"
 
 	if {_id} is "heal_rate":
-		set {_value_old} to "%tag ""heal_rate_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""heal_rate"" of nbt of {_item.1}%" parsed as number > "%tag ""heal_rate"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""heal_rate"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""heal_rate"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@heal_rate_rise_max}
-		set {_give} to potion named "&a回復受容力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@heal_rate_rise_max})%" and "" and "&a回復受容力 &a+%{_value} / 100%%%"
-		add "{CustomPotionColor:5635925,id:heal_rate,type:armor,type2:element,heal_rate_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&a回復受容力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@heal_rate_rise_max})%" and "" and "&a回復受容力 &a+%{_value} / 100%%%"
+			add "{CustomPotionColor:5635925,id:heal_rate,type:armor,type2:element,heal_rate_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&a回復受容力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@heal_rate_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&a回復受容力 &a+%{_value_old} / 100%%% &f~ &a%{_star} / 5 * {@heal_rate_rise_max} / 100%%%"
 
 	if {_id} is "speed":
-		set {_value_old} to "%tag ""speed_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""speed"" of nbt of {_item.1}%" parsed as number > "%tag ""speed"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""speed"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""speed"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@speed_rise_max}
-		set {_give} to potion named "&b速力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@speed_rise_max})%" and "" and "&b速力 &b+%{_value} / 100%%%"
-		add "{CustomPotionColor:5636095,id:speed,type:armor,type2:element,speed_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&b速力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@speed_rise_max})%" and "" and "&b速力 &b+%{_value} / 100%%%"
+			add "{CustomPotionColor:5636095,id:speed,type:armor,type2:element,speed_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&b速力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@speed_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&b速力 &b+%{_value_old} / 100%%% &f~ &b%{_star} / 5 * {@speed_rise_max} / 100%%%"
 
 	if {_id} is "cost_add":
-		set {_value_old} to "%tag ""cost_add_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""cost_add"" of nbt of {_item.1}%" parsed as number > "%tag ""cost_add"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""cost_add"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""cost_add"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@cost_add_rise_max}
-		set {_give} to potion named "&6コスト回復力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@cost_add_rise_max})%" and "" and "&6コスト回復力 &6+%{_value} / 100%%%"
-		add "{CustomPotionColor:16755200,id:cost_add,type:armor,type2:element,cost_add_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&6コスト回復力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@cost_add_rise_max})%" and "" and "&6コスト回復力 &6+%{_value} / 100%%%"
+			add "{CustomPotionColor:16755200,id:cost_add,type:armor,type2:element,cost_add_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&6コスト回復力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@cost_add_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&6コスト回復力 &6+%{_value_old} / 100%%% &f~ &6%{_star} / 5 * {@cost_add_rise_max} / 100%%%"
 
 	if {_id} is "hp_max":
-		set {_value_old} to "%tag ""hp_max_rise"" of nbt of {_item}%" parsed as number
+		if "%tag ""hp_max"" of nbt of {_item.1}%" parsed as number > "%tag ""hp_max"" of nbt of {_item.2}%" parsed as number:
+			set {_value_old} to "%tag ""hp_max"" of nbt of {_item.1}%" parsed as number
+		else:
+			set {_value_old} to "%tag ""hp_max"" of nbt of {_item.2}%" parsed as number
 		set {_value} to random integer between {_value_old} and {_star} / 5 * {@hp_max_rise_max}
-		set {_give} to potion named "&4体力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@hp_max_rise_max})%" and "" and "&4体力 &4+%{_value} / 100%%%"
-		add "{CustomPotionColor:11141120,id:hp_max,type:armor,type2:element,hp_max_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 1:
+			set {_give} to potion named "&4体力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value} / {@hp_max_rise_max})%" and "" and "&4体力 &4+%{_value} / 100%%%"
+			add "{CustomPotionColor:11141120,id:hp_max,type:armor,type2:element,hp_max_rise:%{_value}%,star:%{_star}%,Unbreakable:1,HideFlags:63}" to nbt of {_give}
+		if {_mode} is 2:
+			set {_give} to potion named "&4体力&fのエレメント &7(&f%{_star}%&7)" with lore "&7装備-エレメント &8| %{_star.text}%" and "&7評価: %element_score({_value_old} / {@hp_max_rise_max})% &f~ %element_score({_star} / 5)%" and "" and "&4体力 &4+%{_value_old} / 100%%% &f~ &4%{_star} / 5 * {@hp_max_rise_max} / 100%%%"
 
 	return {_give}
 
-function element_mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemtype:
+function element_mix(mode: number, item.1: itemtype, item.2: itemtype) :: itemtype:
 	set {_star.1} to "%tag ""star"" of nbt of {_item.1}%" parsed as number
 	set {_star.2} to "%tag ""star"" of nbt of {_item.2}%" parsed as number
 	if {_star.1} is not {_star.2}:
@@ -293,6 +351,8 @@ function element_mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemt
 	set {_diffence_rise_old} to "%tag ""diffence_rise"" of nbt of {_item.1}%" parsed as number + "%tag ""diffence_rise"" of nbt of {_item.2}%" parsed as number
 	set {_heal_rate_rise_old} to "%tag ""heal_rate_rise"" of nbt of {_item.1}%" parsed as number + "%tag ""heal_rate_rise"" of nbt of {_item.2}%" parsed as number
 	set {_speed_rise_old} to "%tag ""speed_rise"" of nbt of {_item.1}%" parsed as number + "%tag ""speed_rise"" of nbt of {_item.2}%" parsed as number
+	set {_cost_add_rise_old} to "%tag ""cost_add_rise"" of nbt of {_item.1}%" parsed as number + "%tag ""cost_add_rise"" of nbt of {_item.2}%" parsed as number
+	set {_hp_max_rise_old} to "%tag ""hp_max_rise"" of nbt of {_item.1}%" parsed as number + "%tag ""hp_max_rise"" of nbt of {_item.2}%" parsed as number
 
 	if {_star.1} is 1:
 		set {_star.text} to "&f⚝ &7(&f1&7)"
@@ -500,7 +560,7 @@ function element_mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemt
 			add "&6コスト回復力 &6+%{_cost_add_rise} / 100%%%" to lore of {_give}
 			add "{cost_add_rise:%{_cost_add_rise}%}" to nbt of {_give}
 		if {_mode} is 2:
-			add "&6コスト回復力 &6+%{_cost_add_rise_old} * 0.4 / 100%%% &f~ &b%{_cost_add_rise_old} * 0.6 / 100%%%" to lore of {_give}
+			add "&6コスト回復力 &6+%{_cost_add_rise_old} * 0.4 / 100%%% &f~ &6%{_cost_add_rise_old} * 0.6 / 100%%%" to lore of {_give}
 			add {_cost_add_rise_old} * 0.4 / {@cost_add_rise_max} to {_score_min}
 			add {_cost_add_rise_old} * 0.6 / {@cost_add_rise_max} to {_score_max}
 	if {_hp_max_rise_old} > 0:
@@ -514,7 +574,7 @@ function element_mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemt
 			add "&4体力 &4+%{_hp_max_rise} / 100%%%" to lore of {_give}
 			add "{hp_max_rise:%{_hp_max_rise}%}" to nbt of {_give}
 		if {_mode} is 2:
-			add "&4体力 &4+%{_hp_max_rise_old} * 0.4 / 100%%% &f~ &b%{_hp_max_rise_old} * 0.6 / 100%%%" to lore of {_give}
+			add "&4体力 &4+%{_hp_max_rise_old} * 0.4 / 100%%% &f~ &4%{_hp_max_rise_old} * 0.6 / 100%%%" to lore of {_give}
 			add {_hp_max_rise_old} * 0.4 / {@hp_max_rise_max} to {_score_min}
 			add {_hp_max_rise_old} * 0.6 / {@hp_max_rise_max} to {_score_max}
 
@@ -527,9 +587,6 @@ function element_mix(mode: integer, item.1: itemtype, item.2: itemtype) :: itemt
 
 	if {_mode} is 2:
 		set line 2 of lore of {_give} to "&7評価: %element_score({_score_min})% &f~ %element_score({_score_max})%"
-		add "{fake:1}" to nbt of {_give}
-		add "" to lore of {_give}
-		add "&7> &eクリックして合成" to lore of {_give}
 
 	return {_give}
 
