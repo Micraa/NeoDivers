@@ -1,5 +1,5 @@
 
-command /spawn [<text>] [<integer>] [<integer>]:
+command /spawn [<text>] [<number>] [<number>]:
 	permission: skript.admin
 	trigger:
 		if arg-2 is not set:
@@ -31,11 +31,13 @@ on right click:
 function skill_holo(e: entity, h: number, text: string, time: timespan):
 	bind hologram "%{_text}%" to {_e} for {_time} offset by 0, {_h}, 0
 
-function data_id(e: entity, id: string, name: string, level: number, attack_times: number, heal_times: number, hp_max: number, hp_now: number, shield_now: number):
+function data_id(e: entity, id: string, team: string, name: string, level: number, attack_rate: number, attack_times: number, heal_times: number, hp_max: number, hp_now: number, shield_now: number):
 	set {_uuid} to uuid of {_e}
 	set {id::%{_uuid}%} to {_id}
+	set {team::%{_uuid}%} to {_team}
 	set {name::%{_uuid}%} to {_name}
 	set {level::%{_uuid}%} to {_level}
+	set {attack_rate::%{_uuid}%} to {_attack_rate}
 	set {attack_times::%{_uuid}%} to {_attack_times}
 	set {heal_times::%{_uuid}%} to {_heal_times}
 	set {hp_max::%{_uuid}%} to {_hp_max}
@@ -72,24 +74,36 @@ function data_rise(e: entity, attack_rise: number, stable_rise: number, crit_rat
 	set {diffence_rise::%{_uuid}%} to {_diffence_rise}
 	set {heal_rate_rise::%{_uuid}%} to {_heal_rate_rise}
 
-function spawn(id: string, level: integer, loc: location):
+function spawn(id: string, level: number, loc: location):
 	if {_id} is "noai":
 		spawn zombie at {_loc}
 		add "{NoAI:1b,Silent:1b}" to nbt of last spawned entity
-		data_id(last spawned entity, {_id}, "&c&lNoAI &8[&7Lv.&f%{_level}%&8]", {_level}, 1, 0, (10000 + ({_level} * 1000)), (10000 + ({_level} * 1000)), (10000 + ({_level} * 1000)))
+		data_id(last spawned entity, {_id}, "entity", "NoAI", {_level}, 10000, 1, 0, (10000 + ({_level} * 1000)), (10000 + ({_level} * 1000)), (10000 + ({_level} * 1000)) * 3)
 		data_base(last spawned entity, (1000 + ({_level} * 100)), 5000, 5000, 5000, 5000, 1000, 0, 0, 0, 0, 5000, 10000)
 		data_rise(last spawned entity, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 	if {_id} is "zombie":
 		spawn zombie at {_loc}
 		add "{Silent:1b,PersistenceRequired:1b,CanPickUpLoot:0b}" to nbt of last spawned entity
-		data_id(last spawned entity, {_id}, "&c&lZMB-M &8[&7Lv.&f%{_level}%&8]", {_level}, 1, 0, (1000 + ({_level} * 100)), (1000 + ({_level} * 100)), (1000 + ({_level} * 100)))
+		data_id(last spawned entity, {_id}, "entity", "ゾンビ", {_level}, 10000, 1, 0, (1000 + ({_level} * 100)), (1000 + ({_level} * 100)), (1000 + ({_level} * 100)))
 		data_base(last spawned entity, (1000 + ({_level} * 100)), 5000, 4000, 15000, 0, 0, 0, 0, 0, 0, 5000, 10000)
 		#atk:1, stb:2, c_rate:3, c_damage:4, def_res:5, heal:6, atk_res:7, stb_res:8, c_rate_res:9, c_damage_res:10, def:11, heal_rate:12 
+		data_rise(last spawned entity, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+	if {_id} is "skeleton":
+		spawn skeleton at {_loc}
+		add "{Silent:1b,PersistenceRequired:1b,CanPickUpLoot:0b}" to nbt of last spawned entity
+		data_id(last spawned entity, {_id}, "entity", "スケルトン", {_level}, 10000, 1, 0, (1000 + ({_level} * 100)), (1000 + ({_level} * 100)), (1000 + ({_level} * 100)))
+		data_base(last spawned entity, (1000 + ({_level} * 100)), 5000, 4000, 15000, 0, 0, 0, 0, 0, 0, 5000, 10000)
+		data_rise(last spawned entity, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+	if {_id} is "skeleton":
+		spawn skeleton at {_loc}
+		add "{Silent:1b,PersistenceRequired:1b,CanPickUpLoot:0b}" to nbt of last spawned entity
+		data_id(last spawned entity, {_id}, "entity", "スケルトン", {_level}, 10000, 1, 0, (1000 + ({_level} * 100)), (1000 + ({_level} * 100)), (1000 + ({_level} * 100)))
+		data_base(last spawned entity, (1000 + ({_level} * 100)), 5000, 4000, 15000, 0, 0, 0, 0, 0, 0, 5000, 10000)
 		data_rise(last spawned entity, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 #sumple: effect(1, {_e}, "atk", {_e}, "zombie-1", "attack", "rate", 1.1, 10, "&c攻撃力上昇⬆&8: &c10&7%%", "good", 255, 80, 80)
 #ver: rate/num, type: atk
-function effect(mode: integer, a: entity, v: string, e: entity, id: string, type: string, ver: string, value: number, time: number, text: string, or: string, r: integer, g: integer, b: integer):
+function effect(mode: number, a: entity, v: string, e: entity, id: string, type: string, ver: string, value: number, time: number, text: string, or: string, r: number, g: number, b: number):
 	set {_uuid} to uuid of {_e}
 	set {_uuid.a} to uuid of {_a}
 	holo({_e}, "%{_text}%", 2 seconds)
