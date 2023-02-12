@@ -16,7 +16,7 @@ function combo(mode: number, attacker: player, victim: entity):
 	if {_combo} is {combo::%{_uuid}%}:
 		delete {combo::%{_uuid}%}
 
-function projectile_hit(mode: integer, attacker: player, victim: entity):
+function projectile_hit(mode: number, attacker: player, victim: entity):
 	set {_uuid} to uuid of {_attacker}
 	if {_mode} is 1:
 		combo(1, {_attacker}, {_victim})
@@ -175,11 +175,9 @@ on projectile hit:
 	kill event-projectile
 	addshowbreak(hit block, 1)
 
-function bomb(mode: integer, loc: location, attacker: entity, damage: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number):
+function bomb(mode: number, loc: location, attacker: entity, damage: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number):
 	soundloc(all players, {_loc}, "entity.generic.explode", 3, 1)
 	particle("EXPLOSION_HUGE", 1, 0, 0, 0, 0, {_loc})
-	spawn 1 of armor stand at {_loc} with nbt nbt compound from "{Invisible:1b}"
-	set {_e} to last spawned entity
 	set {_random} to random integer between 0 and 99999
 	if {_attacker} is a player:
 		set {_c1} to 180
@@ -191,27 +189,24 @@ function bomb(mode: integer, loc: location, attacker: entity, damage: number, at
 		set {_c3} to 0
 	drawWarpRings style 0, particle "redstone", RGB {_c1}, {_c2}, {_c3}, center {_loc}, id "%{_random}%", rainbowMode false, scan true, height 0.3, radius 4, ringCount 25, ringDensity 100, visibleRange 100
 	set {_uuid} to uuid of {_attacker}
-	loop all entities in radius 4 around {_loc}:
-		loop-entity is alive
-		loop-entity is not a player
-		all blocks between {_loc} and loop-entity is air
-		{team::%{_uuid}%} is not {team::%uuid of loop-entity%}
-		add loop-entity to {_list::*}
+	spawn 1 of armor stand at {_loc} with nbt nbt compound from "{Invisible:1b}"
+	set {_e} to last spawned entity
+	set {_list::*} to research_circle_entity({_loc}, 4, false, false, true)
 	loop {_list::*}:
-		attack({_mode}, {_attacker}, loop-value, {_damage}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
-	loop {_list::*}:
+		attack({_mode}, {_attacker}, loop-value, 1, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {attack_resist::uuid of loop-value}, {stable_resist::uuid of loop-value}, {crit_rate_resist::uuid of loop-value}, {crit_damage_resist::uuid of loop-value}, {diffence::uuid of loop-value})
 		make {_e} damage loop-value by 0
-	teleport {_e} to location(0, 0, 0)
 	kill {_e}
 	loop 4 times:
 		loop all blocks in radius loop-number around {_loc}:
-			add (random integer between 10 - loop-number and 4 - loop-number) to {_break::%location of loop-block%}
+			set {_blocks::*} to all blocks in radius 1 around loop-block
+			{_blocks::*} contains air
+			set {_break::%location of loop-block%} to random integer between 10 - loop-number and 4 - loop-number
 	loop all blocks in radius 4 around {_loc}:
 		addshowbreak(loop-block, {_break::%location of loop-block%})
 	wait 2 ticks
 	stopEffect id "%{_random}%"
 
-function damage_circle(mode: integer, loc: location, range: number, attacker: entity, damage: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number):
+function damage_circle(mode: number, loc: location, range: number, attacker: entity, damage: number, attack: number, stable: number, crit_rate: number, crit_damage: number, diffence_resist: number):
 	soundloc(all players, {_loc}, "entity.firework.large_blast_far", 3, 1)
 	set {_random} to random integer between 0 and 99999
 	if {_attacker} is a player:
@@ -224,24 +219,35 @@ function damage_circle(mode: integer, loc: location, range: number, attacker: en
 		set {_c3} to 0
 	drawWarpRings style 0, particle "redstone", RGB {_c1}, {_c2}, {_c3}, center {_loc}, id "%{_random}%", rainbowMode false, scan true, height 0.3, radius {_range}, ringCount 5*{_range}, ringDensity 100, visibleRange 100
 	set {_uuid} to uuid of {_attacker}
-	loop all entities in radius {_range} around {_loc}:
-		loop-entity is alive
-		loop-entity is not a player
-		all blocks between {_loc} and loop-entity is air
-		{team::%{_uuid}%} is not {team::%uuid of loop-entity%}
-		attack({_mode}, {_attacker}, loop-entity, {_damage}, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {_attack_resist}, {_stable_resist}, {_crit_rate_resist}, {_crit_damage_resist}, {_diffence})
-		damage loop-entity by 0.00001
+	set {_list::*} to research_circle_entity({_loc}, {_range}, false, false, true)
+	loop {_list::*}:
+		attack({_mode}, {_attacker}, loop-value, 1, {_attack}, {_stable}, {_crit_rate}, {_crit_damage}, {_diffence_resist}, {attack_resist::uuid of loop-value}, {stable_resist::uuid of loop-value}, {crit_rate_resist::uuid of loop-value}, {crit_damage_resist::uuid of loop-value}, {diffence::uuid of loop-value})
+		damage loop-value by 0
 	wait 2 ticks
 	stopEffect id "%{_random}%"
 
-function addshowbreak(block: object, n: integer):
+function research_circle_entity(loc: location, range: number, penetrable: boolean, player: boolean, alive: boolean) :: entities:
+	loop all entities in radius {_range} around {_loc}:
+		if {_alive} is true:
+			if loop-entity is not a living entity:
+				continue
+		if {_player} is false:
+			if loop-entity is a player:
+				continue
+		if {_penetrable} is false:
+			if all blocks between {_loc} and loop-entity is not air:
+				continue
+		add loop-entity to {_list::*}
+	return {_list::*}
+
+function addshowbreak(block: object, n: number):
 	set {_loc} to location of {_block}
 	if {blockbreak.stage::%{_loc}%}+{_n} < 9:
 		showbreak({_block}, floor({blockbreak.stage::%{_loc}%}+{_n}))
 	else:
 		showbreak({_block}, 9)
 
-function showbreak(block: object, n: integer):
+function showbreak(block: object, n: number):
 	set {_m} to random integer between 0 and 999999999
 	set {_loc} to location of {_block}
 	if {blockbreak.stage::%{_loc}%} is set:
